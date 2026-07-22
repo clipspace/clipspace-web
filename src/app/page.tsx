@@ -169,7 +169,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-6 text-xs text-muted">
-              held together by a paperclip, not a corporation
+              held together by a paperclip, not a corporation 📎
             </p>
           </div>
 
@@ -319,7 +319,7 @@ export default function Home() {
             Free. Open source. Encrypted. Yours.
           </p>
           <p className="text-xs text-muted">
-            © 2026 clipspace · made with a paperclip and stubbornness
+            © 2026 clipspace · made with 🖇️ and stubbornness
           </p>
           <p className="text-xs text-muted">
             <a href="/privacy" className="hover:text-brass hover:underline">Privacy</a>
