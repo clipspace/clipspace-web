@@ -8,20 +8,20 @@ type Msg = { who: "them" | "me"; text: string };
 // input box below, then "sent"; "them" lines arrive with a typing indicator.
 // Sprinkled with paperclip / Clippy easter eggs.
 const SCRIPT: Msg[] = [
-  { who: "them", text: "so… no ads in here? ever?" },
-  { who: "me", text: "ever. and nobody can read this – not even the server" },
-  { who: "them", text: "okay this is what the internet was supposed to be" },
-  { who: "them", text: "wait it's actually open source too?" },
-  { who: "me", text: "every line. fork it, break it, keep it" },
-  { who: "them", text: "and it's free?? who's paying for all this" },
-  { who: "me", text: "a paperclip and pure spite 🖇️" },
-  { who: "them", text: "lol is the paperclip gonna help me write messages" },
-  { who: "me", text: "it looks like you're trying to stay private. it can help with that" },
-  { who: "them", text: "😂 okay that's the best tagline ever" },
-  { who: "them", text: "does it bend under pressure?" },
-  { who: "me", text: "never. it's spring steel, baby" },
-  { who: "them", text: "moving the group chat here tonight" },
-  { who: "me", text: "bring snacks, leave your phone number" },
+  { who: "them", text: "ok real question. ads in here?" },
+  { who: "me", text: "none. you're not the product this time" },
+  { who: "them", text: "my family group chat just showed me an ad mid-argument" },
+  { who: "me", text: "yeah. we don't do that" },
+  { who: "them", text: "and nobody can read this? like actually?" },
+  { who: "me", text: "i can't read it and i built it" },
+  { who: "them", text: "even the server?" },
+  { who: "me", text: "the server just holds noise. your key is the only thing that turns it back into words" },
+  { who: "them", text: "okay this is unreasonably based" },
+  { who: "them", text: "what's with the paperclip though" },
+  { who: "me", text: "he holds your stuff together and stays out of your business" },
+  { who: "them", text: "so… the anti-clippy" },
+  { who: "me", text: "he read the room. clippy never did" },
+  { who: "them", text: "moving movie night here. i'll bring snacks 🖇️" },
 ];
 
 const WINDOW = 4;
