@@ -93,7 +93,7 @@ export default function WalkingPal() {
   return (
     <div
       ref={wrapRef}
-      className="pointer-events-none fixed bottom-1 left-0 z-40 hidden sm:block"
+      className="pointer-events-none fixed bottom-1 left-0 z-40 block xl:hidden"
       style={{ transform: "translateX(24px)" }}
       aria-hidden
     >

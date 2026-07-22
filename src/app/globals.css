@@ -135,6 +135,15 @@ html {
 }
 .pal-hop { animation: pal-hop 0.62s ease-in-out infinite; transform-origin: 50% 92%; }
 
+/* leg-tapping walk for the scroll guide (bob while moving) */
+@keyframes pal-walk {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-4px) rotate(-3deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-3px) rotate(3deg); }
+}
+.pal-walk { animation: pal-walk 0.5s ease-in-out infinite; transform-origin: 50% 92%; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .reveal-ready [data-reveal],

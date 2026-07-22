@@ -74,28 +74,6 @@ function Feature({
   );
 }
 
-/* the clip pal – a whole brass paperclip with a face, alive with a
-   gentle sway and the odd blink */
-function PaperclipPal({ size = 72 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size * 1.6}
-      viewBox="0 0 50 80"
-      fill="none"
-      aria-hidden
-      className="pal-wiggle"
-    >
-      <g stroke="#D9A441" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20" />
-        <path d="M15 63 C15 71 20 75 27 75 C35 75 41 71 41 62 L41 54" />
-      </g>
-      <circle className="pal-eye" cx="22" cy="12" r="2.4" fill="#F2EDE0" />
-      <circle className="pal-eye" cx="30" cy="12" r="2.4" fill="#F2EDE0" />
-    </svg>
-  );
-}
-
 /* ---------- page ---------- */
 
 export default function Home() {
@@ -118,7 +96,7 @@ export default function Home() {
       </header>
 
       {/* hero */}
-      <section>
+      <section id="hero">
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-24 pt-14 md:grid-cols-2 md:pt-20">
           <div data-reveal className="min-w-0">
             <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brass">
@@ -214,12 +192,7 @@ export default function Home() {
 
       {/* why */}
       <section id="why" className="border-y border-line bg-surface">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 md:grid-cols-[auto_1fr]">
-          <div className="mx-auto" data-reveal>
-            <div className="animate-float">
-              <PaperclipPal size={90} />
-            </div>
-          </div>
+        <div className="mx-auto max-w-6xl px-6 py-20">
           <div data-reveal>
             <h2 className="font-display text-3xl font-bold md:text-4xl">
               Remember when software was on <em>your</em> side?
@@ -283,7 +256,7 @@ export default function Home() {
       </section>
 
       {/* footer */}
-      <footer className="border-t border-line">
+      <footer id="contact" className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 py-10 text-center">
           <Logo size={28} textClass="text-lg" />
           <p className="max-w-md text-sm text-muted">
