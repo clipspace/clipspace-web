@@ -279,10 +279,10 @@ export default function Home() {
               Built in the open.
             </h2>
             <p className="mt-5 leading-relaxed text-muted">
-              Clipspace is being built right now, in public, under a free
-              software license. It&apos;s not ready yet — star the repo to
-              follow along, open issues, send patches, or just watch us bend
-              the wire into shape.
+              Clipspace is being built right now, in public, on GitHub.
+              It&apos;s not ready yet — star the repo to follow along, open
+              issues, send patches, or just watch us bend the wire into
+              shape.
             </p>
             <a
               href="https://github.com/OckoTajny/clipspace-web"
@@ -321,6 +321,13 @@ export default function Home() {
           </p>
           <p className="text-xs text-muted">
             © 2026 clipspace · made with a paperclip and stubbornness
+          </p>
+          <p className="text-xs text-muted">
+            <a href="/privacy" className="hover:text-brass hover:underline">Privacy</a>
+            {" · "}
+            <a href="https://github.com/OckoTajny/clipspace-web" className="hover:text-brass hover:underline">GitHub</a>
+            {" · "}
+            <a href="mailto:jachym@djt-group.com" className="hover:text-brass hover:underline">Contact</a>
           </p>
         </div>
       </footer>
