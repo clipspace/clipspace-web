@@ -156,6 +156,12 @@ html {
 .pal-say {
   animation: pal-say 0.34s cubic-bezier(0.22, 0.85, 0.3, 1) both;
 }
+/* …and quietly fades away once he's done talking or starts moving */
+.pal-bubble-hide {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
 
 /* one-legged hop for the walking pal */
 @keyframes pal-hop {

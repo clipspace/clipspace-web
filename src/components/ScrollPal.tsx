@@ -5,45 +5,68 @@ import PalSvg from "./PalSvg";
 
 // Desktop-only scroll guide, scrollytelling style: the pal's position is a
 // smooth function of scroll progress. Between stops he sweeps across the
-// screen on a gentle arc (smoothstep easing, so he lingers at stops and
-// glides in between), leans into his stride, steps with his leg, and pops a
-// fresh speech bubble whenever he has something new to say.
+// screen on a gentle arc, leans into his stride and steps with his leg.
+// He parks in the empty gutter beside the content column so he never sits
+// on top of text, and his speech bubble pops on arrival, stays long enough
+// to read, then fades away so nothing stays covered.
 // (Placeholder lines — the user will replace them.)
 const STOPS = [
-  { id: "hero", pos: 0.05, line: "hey — i'm the paperclip. i hold this whole thing together." },
-  { id: "features", pos: 0.93, line: "no ads, no tracking, no catch. all of it, yours." },
-  { id: "why", pos: 0.08, line: "remember when software was on your side? same." },
-  { id: "opensource", pos: 0.92, line: "every line is public. read it, fork it, trust it." },
-  { id: "contact", pos: 0.47, line: "that's the tour. built with a paperclip and stubbornness." },
+  { id: "hero", side: "left" as const, line: "hey — i'm the paperclip. i hold this whole thing together." },
+  { id: "features", side: "right" as const, line: "no ads, no tracking, no catch. all of it, yours." },
+  { id: "why", side: "left" as const, line: "remember when software was on your side? same." },
+  { id: "opensource", side: "right" as const, line: "every line is public. read it, fork it, trust it." },
+  { id: "contact", side: "left" as const, line: "that's the tour. built with a paperclip and stubbornness." },
 ];
 
-const PAL_W = 88;
-const EDGE = 40; // minimum breathing room at either side of the screen
+const CONTENT_W = 1152; // max-w-6xl — the pal parks in the gutter beside it
+const BUBBLE_MS = 6500; // how long a line stays up before fading out
 
 export default function ScrollPal() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const palRef = useRef<HTMLDivElement>(null);
   const [line, setLine] = useState(STOPS[0].line);
-  const [bubbleRight, setBubbleRight] = useState(STOPS[0].pos <= 0.5);
+  const [bubbleRight, setBubbleRight] = useState(STOPS[0].side === "left");
+  const [bubbleOn, setBubbleOn] = useState(true);
+  const [typing, setTyping] = useState(true);
+  const [arrivalId, setArrivalId] = useState(0);
   const [walking, setWalking] = useState(false);
+  const [palW, setPalW] = useState(88);
 
-  const target = useRef({ x: EDGE, y: 0 });
-  const cur = useRef({ x: EDGE, y: 0, lean: 0, facing: 1 as 1 | -1 });
+  const target = useRef({ x: 40, y: 0 });
+  const cur = useRef({ x: 40, y: 0, lean: 0, facing: 1 as 1 | -1 });
+  const palWRef = useRef(88);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const posToX = (p: number) =>
-      EDGE + p * (window.innerWidth - PAL_W - EDGE * 2);
+    const gutter = () => Math.max(0, (window.innerWidth - CONTENT_W) / 2);
+
+    const sizePal = () => {
+      // full size when the gutter can hold him, a notch smaller on narrow
+      // desktops so he still fits beside the content
+      const w = gutter() >= 104 ? 88 : 66;
+      if (w !== palWRef.current) {
+        palWRef.current = w;
+        setPalW(w);
+      }
+    };
+
+    const parkLeft = () => Math.max(6, (gutter() - palWRef.current) / 2);
+    const parkRight = () => window.innerWidth - palWRef.current - parkLeft();
 
     const computeTarget = () => {
+      sizePal();
       const vc = window.innerHeight / 2;
       const pts: { center: number; x: number; stop: (typeof STOPS)[number] }[] = [];
       for (const s of STOPS) {
         const el = document.getElementById(s.id);
         if (!el) continue;
         const r = el.getBoundingClientRect();
-        pts.push({ center: r.top + r.height / 2, x: posToX(s.pos), stop: s });
+        pts.push({
+          center: r.top + r.height / 2,
+          x: s.side === "left" ? parkLeft() : parkRight(),
+          stop: s,
+        });
       }
       if (pts.length === 0) return;
 
@@ -69,18 +92,20 @@ export default function ScrollPal() {
             near = t < 0.5 ? a.stop : b.stop;
             t = t * t * (3 - 2 * t); // smoothstep: rest at stops, sweep between
             x = a.x + (b.x - a.x) * t;
-            y = -Math.sin(t * Math.PI) * 22; // gentle arc, a little hop between stops
+            y = -Math.sin(t * Math.PI) * 22; // gentle arc between stops
             break;
           }
         }
       }
       target.current = { x, y };
       setLine(near.line);
-      setBubbleRight(near.pos <= 0.5);
+      setBubbleRight(near.side === "left");
     };
 
     let raf = 0;
-    let wasWalking = false;
+    let wasWalking = true; // start "walking" so the first idle frame counts as an arrival
+    let hideTimer: ReturnType<typeof setTimeout> | undefined;
+    let typeTimer: ReturnType<typeof setTimeout> | undefined;
 
     const loop = () => {
       const c = cur.current;
@@ -103,6 +128,20 @@ export default function ScrollPal() {
       if (isWalking !== wasWalking) {
         wasWalking = isWalking;
         setWalking(isWalking);
+        clearTimeout(hideTimer);
+        clearTimeout(typeTimer);
+        if (isWalking) {
+          // tuck the bubble away while he's on the move
+          setBubbleOn(false);
+        } else {
+          // arrived: pop the bubble with typing dots, then the line,
+          // let it sit long enough to read, then fade it out
+          setBubbleOn(true);
+          setTyping(true);
+          setArrivalId((n) => n + 1);
+          typeTimer = setTimeout(() => setTyping(false), 900);
+          hideTimer = setTimeout(() => setBubbleOn(false), BUBBLE_MS);
+        }
       }
 
       if (wrapRef.current) {
@@ -124,6 +163,8 @@ export default function ScrollPal() {
 
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(hideTimer);
+      clearTimeout(typeTimer);
       window.removeEventListener("scroll", computeTarget);
       window.removeEventListener("resize", computeTarget);
     };
@@ -133,29 +174,40 @@ export default function ScrollPal() {
     <div
       ref={wrapRef}
       className="pointer-events-none fixed left-0 top-1/2 z-40 hidden xl:block"
-      style={{ transform: `translate(${EDGE}px, -50%)` }}
+      style={{ transform: "translate(40px, -50%)" }}
       aria-hidden
     >
       <div className="relative">
-        {/* key={line} remounts the bubble so it pops every time he says
-            something new; it always opens toward the middle of the screen */}
+        {/* sits up by his head; pops on arrival (key remount) with typing
+            dots first, then the line, and fades out after a few seconds so
+            it never keeps covering the page */}
         <div
-          className={`absolute top-1/2 -translate-y-1/2 ${
-            bubbleRight ? "left-[104px]" : "right-[104px]"
-          }`}
+          className="absolute -translate-y-1/2"
+          style={{
+            top: "calc(50% - 72px)",
+            ...(bubbleRight ? { left: palW + 14 } : { right: palW + 14 }),
+          }}
         >
           <div
-            key={line}
-            className={`pal-say w-max max-w-[300px] rounded-2xl border border-line bg-surface px-4 py-3 text-sm leading-relaxed text-cream shadow-lg ${
-              bubbleRight ? "origin-left rounded-bl-md" : "origin-right rounded-br-md"
+            key={arrivalId}
+            className={`${bubbleOn ? "pal-say" : "pal-bubble-hide"} w-max max-w-[260px] rounded-2xl border border-line bg-surface px-4 py-2.5 text-sm leading-relaxed text-cream shadow-lg ${
+              bubbleRight ? "origin-bottom-left rounded-bl-md" : "origin-bottom-right rounded-br-md"
             }`}
           >
-            {line}
+            {typing ? (
+              <span className="flex items-center gap-1 py-1.5">
+                <span className="dot-blink inline-block h-1.5 w-1.5 rounded-full bg-muted" />
+                <span className="dot-blink-2 inline-block h-1.5 w-1.5 rounded-full bg-muted" />
+                <span className="dot-blink-3 inline-block h-1.5 w-1.5 rounded-full bg-muted" />
+              </span>
+            ) : (
+              line
+            )}
           </div>
         </div>
         <div ref={palRef}>
           <div className={walking ? "pal-walk" : "pal-idle"}>
-            <PalSvg width={PAL_W} walking={walking} />
+            <PalSvg width={palW} walking={walking} />
           </div>
         </div>
       </div>
