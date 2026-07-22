@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import ScrollReveal from "@/components/ScrollReveal";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -32,6 +33,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {children}
+        <ScrollReveal />
         <Analytics />
       </body>
     </html>

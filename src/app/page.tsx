@@ -114,7 +114,7 @@ export default function Home() {
       {/* hero */}
       <section>
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-24 pt-14 md:grid-cols-2 md:pt-20">
-          <div>
+          <div data-reveal>
             <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brass">
               work in progress, coming soon
             </p>
@@ -151,7 +151,7 @@ export default function Home() {
           </div>
 
           {/* mock chat card */}
-          <div className="animate-float">
+          <div className="animate-float" data-reveal>
             <div className="rounded-2xl border border-line bg-surface p-5">
               <div className="flex items-center justify-between border-b border-line pb-4">
                 <div className="flex items-center gap-3">
@@ -187,12 +187,12 @@ export default function Home() {
 
       {/* features */}
       <section id="features" className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className="font-display text-center text-3xl font-bold md:text-4xl">
+        <h2 className="font-display text-center text-3xl font-bold md:text-4xl" data-reveal>
           Everything a social network should be.
           <br />
           <span className="text-muted">Nothing it shouldn&apos;t.</span>
         </h2>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-reveal-stagger>
           <Feature icon="lock" title="End-to-end encrypted">
             Every message, post and photo is encrypted on your device. Your keys
             never leave your pocket, so nobody in between can read a thing.
@@ -223,10 +223,10 @@ export default function Home() {
       {/* why */}
       <section id="why" className="border-y border-line bg-surface">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 md:grid-cols-[auto_1fr]">
-          <div className="mx-auto animate-float">
+          <div className="mx-auto animate-float" data-reveal>
             <PaperclipPal size={90} />
           </div>
-          <div>
+          <div data-reveal>
             <h2 className="font-display text-3xl font-bold md:text-4xl">
               Remember when software was on <em>your</em> side?
             </h2>
@@ -250,7 +250,7 @@ export default function Home() {
       {/* open source */}
       <section id="opensource" className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid items-center gap-12 md:grid-cols-2">
-          <div>
+          <div data-reveal>
             <h2 className="font-display text-3xl font-bold md:text-4xl">
               Built in the open.
             </h2>
@@ -267,7 +267,7 @@ export default function Home() {
               Star on GitHub ↗
             </a>
           </div>
-          <div className="rounded-xl border border-line bg-surface p-6 font-mono text-sm leading-relaxed">
+          <div className="rounded-xl border border-line bg-surface p-6 font-mono text-sm leading-relaxed" data-reveal>
             <p className="text-muted"># coming soon</p>
             <p className="mt-2">
               <span className="text-brass">$</span> git clone
