@@ -1,5 +1,6 @@
 import { Logo, LogoIcon } from "@/components/Logo";
 import ChatDemo from "@/components/ChatDemo";
+import PalSvg from "@/components/PalSvg";
 
 /* ---------- small building blocks ---------- */
 
@@ -192,7 +193,16 @@ export default function Home() {
 
       {/* why */}
       <section id="why" className="border-y border-line bg-surface">
-        <div className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-[auto_1fr] xl:grid-cols-1">
+          {/* the clip pal keeps you company here on phone & tablet; on
+              desktop the walking guide passes through instead */}
+          <div className="mx-auto md:mx-0 xl:hidden" data-reveal>
+            <div className="animate-float">
+              <div className="pal-idle">
+                <PalSvg width={90} />
+              </div>
+            </div>
+          </div>
           <div data-reveal>
             <h2 className="font-display text-3xl font-bold md:text-4xl">
               Remember when software was on <em>your</em> side?
