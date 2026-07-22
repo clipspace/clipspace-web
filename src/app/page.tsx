@@ -80,18 +80,16 @@ function PaperclipPal({ size = 72 }: { size?: number }) {
   return (
     <svg
       width={size}
-      height={size * 1.4}
-      viewBox="0 0 50 70"
+      height={size * 1.54}
+      viewBox="0 0 56 86"
       fill="none"
       aria-hidden
       className="pal-wiggle"
     >
-      <path
-        d="M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"
-        stroke="#D9A441"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
+      <g stroke="#D9A441" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20" />
+        <path d="M15 62 C15 72 21 78 31 78 C43 78 49 72 49 60 L49 48" />
+      </g>
       <circle className="pal-eye" cx="22" cy="12" r="2.4" fill="#F2EDE0" />
       <circle className="pal-eye" cx="30" cy="12" r="2.4" fill="#F2EDE0" />
     </svg>
