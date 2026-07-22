@@ -211,9 +211,9 @@ export default function Home() {
       {/* features */}
       <section id="features" className="mx-auto max-w-6xl px-6 py-20">
         <h2 className="font-display text-center text-3xl font-bold md:text-4xl">
-          A place to talk to people you like.
+          Everything a social network should be.
           <br />
-          <span className="text-muted">That&apos;s it. That&apos;s the product.</span>
+          <span className="text-muted">Nothing it shouldn&apos;t.</span>
         </h2>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Feature icon="lock" title="End-to-end encrypted">
