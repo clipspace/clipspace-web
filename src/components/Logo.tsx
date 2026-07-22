@@ -1,8 +1,16 @@
 // Clipspace logo — a speech bubble bent from a single paperclip wire.
 // The wire enters at the tail, wraps the bubble, and curls inward like
-// a paperclip coil. Three dots = someone's typing in your space.
+// a paperclip coil. Steel-colored, like an actual paperclip. Dots = typing.
 
-export function LogoIcon({ size = 48 }: { size?: number }) {
+export function LogoIcon({
+  size = 48,
+  wire = "#7C8391",
+  dots = "#1C1914",
+}: {
+  size?: number;
+  wire?: string;
+  dots?: string;
+}) {
   return (
     <svg
       width={size}
@@ -12,12 +20,6 @@ export function LogoIcon({ size = 48 }: { size?: number }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-label="Clipspace logo"
     >
-      <defs>
-        <linearGradient id="clipwire" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#6D8BFF" />
-          <stop offset="1" stopColor="#8B5CF6" />
-        </linearGradient>
-      </defs>
       {/* one continuous wire: tail → around the bubble → inner coil */}
       <path
         d="M24 61
@@ -37,24 +39,24 @@ export function LogoIcon({ size = 48 }: { size?: number }) {
            L44 17
            C48 17 50 19.5 50 23
            L50 28"
-        stroke="url(#clipwire)"
+        stroke={wire}
         strokeWidth="5.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       {/* typing dots */}
-      <circle cx="30" cy="31.5" r="2.9" fill="#E7EAF6" />
-      <circle cx="38.5" cy="31.5" r="2.9" fill="#E7EAF6" />
-      <circle cx="47" cy="31.5" r="2.9" fill="#8B93B0" />
+      <circle cx="30" cy="31.5" r="2.9" fill={dots} />
+      <circle cx="38.5" cy="31.5" r="2.9" fill={dots} />
+      <circle cx="47" cy="31.5" r="2.9" fill={dots} opacity="0.45" />
     </svg>
   );
 }
 
 export function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <span className={`font-bold tracking-tight lowercase ${className}`}>
-      <span className="text-[#6D8BFF]">clip</span>
-      <span className="text-[#AeB4CC]">space</span>
+    <span className={`font-display font-semibold tracking-tight lowercase ${className}`}>
+      <span className="text-ink">clip</span>
+      <span className="text-steel">space</span>
     </span>
   );
 }
