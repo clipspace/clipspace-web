@@ -71,11 +71,15 @@ html {
 .reveal-ready [data-reveal-stagger].in > *:nth-child(6) { transition-delay: 0.35s; }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
 }
 .animate-float {
   animation: float 6s ease-in-out infinite;
+  /* own compositor layer so the live chat re-rendering inside it
+     doesn't stutter the float */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 @keyframes blink {
@@ -87,10 +91,20 @@ html {
 .dot-blink-3 { animation: blink 1.4s ease-in-out 0.5s infinite; }
 
 @keyframes msg-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
+  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  55% { opacity: 1; transform: translateY(-3px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
-.msg-in { animation: msg-in 0.35s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.msg-in {
+  animation: msg-in 0.42s cubic-bezier(0.22, 0.85, 0.3, 1) both;
+  transform-origin: bottom center;
+}
+
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.type-caret { animation: caret-blink 1s steps(1) infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
