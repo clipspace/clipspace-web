@@ -11,7 +11,9 @@ export default function ScrollReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     root.classList.add("reveal-ready");
-    const els = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const els = document.querySelectorAll<HTMLElement>(
+      "[data-reveal], [data-reveal-stagger]"
+    );
 
     const io = new IntersectionObserver(
       (entries) => {
