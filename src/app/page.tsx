@@ -26,7 +26,7 @@ function ChatBubble({
   );
 }
 
-/* tiny brass line icons — primitives only, no icon font */
+/* tiny brass line icons – primitives only, no icon font */
 function FeatureIcon({ kind }: { kind: string }) {
   const s = {
     stroke: "#D9A441",
@@ -97,7 +97,7 @@ function Feature({
   );
 }
 
-/* the clip pal — brass wire, cream eyes */
+/* the clip pal – brass wire, cream eyes */
 function PaperclipPal({ size = 72 }: { size?: number }) {
   return (
     <svg width={size} height={size * 1.4} viewBox="0 0 50 70" fill="none" aria-hidden>
@@ -191,7 +191,7 @@ export default function Home() {
               <div className="flex flex-col gap-3 py-5">
                 <ChatBubble side="left">so… no ads in here? ever?</ChatBubble>
                 <ChatBubble side="right" tone="me">
-                  ever. and nobody can read this — not even the server
+                  ever. and nobody can read this – not even the server
                 </ChatBubble>
                 <ChatBubble side="left">okay this is what the internet was supposed to be</ChatBubble>
                 <div className="flex items-center gap-1.5 pl-2 pt-1">

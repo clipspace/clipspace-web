@@ -1,4 +1,4 @@
-// Clipspace logo — a speech bubble bent from a single paperclip wire.
+// Clipspace logo – a speech bubble bent from a single paperclip wire.
 // The wire enters at the tail, wraps the bubble, and curls inward like
 // a paperclip coil. Brass wire, cream dots.
 

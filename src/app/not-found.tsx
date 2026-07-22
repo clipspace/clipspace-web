@@ -7,7 +7,7 @@ export default function NotFound() {
       <Logo size={40} textClass="text-2xl" />
       <h1 className="font-display text-5xl font-bold">404</h1>
       <p className="max-w-sm text-muted">
-        The clip couldn&apos;t hold this page — it doesn&apos;t exist, or it
+        The clip couldn&apos;t hold this page – it doesn&apos;t exist, or it
         slipped out of the stack.
       </p>
       <Link

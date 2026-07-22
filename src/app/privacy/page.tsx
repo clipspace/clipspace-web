@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
-  title: "privacy policy — clipspace",
+  title: "privacy policy – clipspace",
   description:
     "How the clipspace website handles your data: no cookies, no analytics, no trackers. Just server logs at our hosting provider.",
 };
@@ -40,7 +40,7 @@ export default function Privacy() {
             <strong className="text-cream">no analytics</strong>, embeds{" "}
             <strong className="text-cream">no trackers</strong>, and has no accounts or
             forms. The only data that exists at all are standard server logs at our
-            hosting provider. We couldn&apos;t sell your data even if we wanted to —
+            hosting provider. We couldn&apos;t sell your data even if we wanted to –
             we don&apos;t have any.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function Privacy() {
             </a>{" "}
             (as our data processor) automatically processes standard technical server
             logs: your IP address, browser user-agent, requested URL, and time of
-            request. This happens on every website on the internet — it&apos;s how
+            request. This happens on every website on the internet – it&apos;s how
             web servers work.
           </p>
           <p>
@@ -82,10 +82,10 @@ export default function Privacy() {
 
         <Section title="What is NOT happening">
           <ul className="list-inside list-disc space-y-1">
-            <li>No cookies are set — which is why there is no cookie banner.</li>
+            <li>No cookies are set – which is why there is no cookie banner.</li>
             <li>No analytics or measurement of any kind.</li>
             <li>No advertising, no third-party embeds, no social media pixels.</li>
-            <li>No accounts, no forms, no newsletter — we collect nothing from you.</li>
+            <li>No accounts, no forms, no newsletter – we collect nothing from you.</li>
             <li>No data is sold or shared with anyone beyond the hosting described above.</li>
           </ul>
         </Section>
@@ -100,7 +100,7 @@ export default function Privacy() {
           </p>
           <p>
             You also have the right to lodge a complaint with a supervisory
-            authority — in the Czech Republic that is the Office for Personal Data
+            authority – in the Czech Republic that is the Office for Personal Data
             Protection (
             <a href="https://uoou.gov.cz" className="text-brass hover:underline" rel="noopener noreferrer">
               ÚOOÚ
