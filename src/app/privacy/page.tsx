@@ -36,12 +36,11 @@ export default function Privacy() {
         <div className="mt-8 rounded-xl border border-brass/40 bg-surface p-5 leading-relaxed">
           <p className="font-display font-bold text-brass">The short version</p>
           <p className="mt-2 text-muted">
-            This website sets <strong className="text-cream">no cookies</strong>, runs{" "}
-            <strong className="text-cream">no analytics</strong>, embeds{" "}
-            <strong className="text-cream">no trackers</strong>, and has no accounts or
-            forms. The only data that exists at all are standard server logs at our
-            hosting provider. We couldn&apos;t sell your data even if we wanted to –
-            we don&apos;t have any.
+            This website sets <strong className="text-cream">no cookies</strong>,
+            embeds <strong className="text-cream">no ad trackers</strong>, and has
+            no accounts or forms. We use privacy-friendly, cookieless analytics that
+            counts visits in aggregate and never identifies you – so there is
+            nothing about you to sell, and no reason for a cookie banner.
           </p>
         </div>
 
@@ -80,13 +79,31 @@ export default function Privacy() {
           </p>
         </Section>
 
+        <Section title="Analytics">
+          <p>
+            We use{" "}
+            <a
+              href="https://vercel.com/docs/analytics/privacy-policy"
+              className="text-brass hover:underline"
+              rel="noopener noreferrer"
+            >
+              Vercel Web Analytics
+            </a>
+            , a privacy-friendly analytics tool. It counts page views and tells us
+            roughly where visitors come from (country, referrer, device type) in
+            aggregate. It sets <strong className="text-cream">no cookies</strong>,
+            uses no cross-site tracking, and does not build a profile of you or
+            store data that identifies you – which is why this site needs no cookie
+            banner.
+          </p>
+        </Section>
+
         <Section title="What is NOT happening">
           <ul className="list-inside list-disc space-y-1">
             <li>No cookies are set – which is why there is no cookie banner.</li>
-            <li>No analytics or measurement of any kind.</li>
-            <li>No advertising, no third-party embeds, no social media pixels.</li>
+            <li>No Google Analytics, no advertising, no social media pixels.</li>
             <li>No accounts, no forms, no newsletter – we collect nothing from you.</li>
-            <li>No data is sold or shared with anyone beyond the hosting described above.</li>
+            <li>No data is sold or shared with anyone beyond the services described above.</li>
           </ul>
         </Section>
 
