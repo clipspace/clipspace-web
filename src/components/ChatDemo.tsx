@@ -43,7 +43,7 @@ const GENZ: Msg[] = [
 
 const SCRIPTS = [CLASSIC, GENZ];
 
-const WINDOW = 3;
+const WINDOW = 4;
 const PLACEHOLDER = "Message weekend crew…";
 
 function Bubble({ who, children }: { who: "them" | "me"; children: React.ReactNode }) {
@@ -147,7 +147,7 @@ export default function ChatDemo() {
 
   return (
     <>
-      <div className="chat-fade-top flex h-[236px] flex-col justify-end gap-3 overflow-hidden py-5">
+      <div className="flex h-[224px] flex-col justify-end gap-3 overflow-hidden py-5">
         {shown.map(({ m, key }) => (
           <Bubble key={key} who={m.who}>
             {m.text}
