@@ -200,8 +200,19 @@ export default function Home() {
                   <span className="dot-blink-3 h-2 w-2 rounded-full bg-muted" />
                 </div>
               </div>
-              <div className="rounded-full border border-line px-4 py-2.5 text-sm text-muted">
-                Message weekend crew…
+              <div className="flex items-center gap-2">
+                <div className="flex-1 rounded-full border border-line px-4 py-2.5 text-sm text-muted">
+                  Message weekend crew…
+                </div>
+                <button
+                  type="button"
+                  aria-label="Send message"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brass text-bg transition-colors hover:bg-brass-soft"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M2.5 20.5 L21.5 12 L2.5 3.5 L2.5 10.2 L15.5 12 L2.5 13.8 Z" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
