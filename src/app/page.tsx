@@ -138,9 +138,8 @@ export default function Home() {
       <section>
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-24 pt-14 md:grid-cols-2 md:pt-20">
           <div>
-            <p className="font-display inline-flex items-center gap-2 rounded-full border border-brass/40 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-brass">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-brass" />
-              work in progress — coming soon
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brass">
+              work in progress, coming soon
             </p>
             <h1 className="font-display mt-6 text-5xl font-bold leading-[1.05] md:text-6xl">
               Your space.
@@ -169,7 +168,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-6 text-xs text-muted">
-              held together by a paperclip — not by a corporation
+              held together by a paperclip, not a corporation
             </p>
           </div>
 
@@ -200,9 +199,8 @@ export default function Home() {
                   <span className="dot-blink-3 h-2 w-2 rounded-full bg-muted" />
                 </div>
               </div>
-              <div className="flex items-center gap-3 rounded-full border border-line px-4 py-2.5 text-sm text-muted">
-                <span>Message weekend crew…</span>
-                <span className="ml-auto text-brass">➤</span>
+              <div className="rounded-full border border-line px-4 py-2.5 text-sm text-muted">
+                Message weekend crew…
               </div>
             </div>
           </div>
@@ -219,10 +217,10 @@ export default function Home() {
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Feature icon="lock" title="End-to-end encrypted">
             Every message, post and photo is encrypted on your device. Your keys
-            never leave your pocket — so nobody in between can read a thing.
+            never leave your pocket, so nobody in between can read a thing.
           </Feature>
           <Feature icon="code" title="100% open source">
-            All of it — clients, server, crypto. Audit it, fork it, break it,
+            All of it: clients, server, crypto. Audit it, fork it, break it,
             fix it. Trust that&apos;s verified, not promised.
           </Feature>
           <Feature icon="free" title="Free forever">
@@ -234,8 +232,8 @@ export default function Home() {
             You choose who&apos;s in your space and what you see.
           </Feature>
           <Feature icon="home" title="Self-hostable">
-            Run your own server for your friends, family or community —
-            or just join one you trust. Your data lives where you say.
+            Run your own server for your friends, family or community, or
+            just join one you trust. Your data lives where you say.
           </Feature>
           <Feature icon="nophone" title="No phone number">
             Sign up without a phone number or real name. Who you are on
@@ -262,7 +260,7 @@ export default function Home() {
               asset.
             </p>
             <p className="mt-4 max-w-2xl leading-relaxed text-muted">
-              Clipspace is our way back — the earnest, slightly dorky
+              Clipspace is our way back: the earnest, slightly dorky
               helpfulness of 90s software with the cryptography of 2026. It
               looks like you&apos;re trying to talk to your friends in
               private. We can help with that.
@@ -280,7 +278,7 @@ export default function Home() {
             </h2>
             <p className="mt-5 leading-relaxed text-muted">
               Clipspace is being built right now, in public, on GitHub.
-              It&apos;s not ready yet — star the repo to follow along, open
+              It&apos;s not ready yet. Star the repo to follow along, open
               issues, send patches, or just watch us bend the wire into
               shape.
             </p>
