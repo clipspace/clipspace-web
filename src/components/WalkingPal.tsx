@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import PalSvg from "./PalSvg";
 
 // The clip pal, out for a walk along the bottom of the page. He hops on his
 // one leg, turns around at the edges, blinks, and every so often stops to
@@ -16,19 +17,6 @@ const FACTS = [
   "Fun fact: I have exactly one leg and zero regrets.",
   "No ad has ever been shown in this chat. Ever.",
 ];
-
-function PalFace() {
-  return (
-    <svg width="40" height="64" viewBox="0 0 50 80" fill="none" aria-hidden className="pal-hop">
-      <g stroke="#D9A441" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20" />
-        <path d="M15 63 C15 71 20 75 27 75 C35 75 41 71 41 62 L41 54" />
-      </g>
-      <circle className="pal-eye" cx="22" cy="12" r="2.4" fill="#F2EDE0" />
-      <circle className="pal-eye" cx="30" cy="12" r="2.4" fill="#F2EDE0" />
-    </svg>
-  );
-}
 
 export default function WalkingPal() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -98,12 +86,14 @@ export default function WalkingPal() {
       aria-hidden
     >
       {fact ? (
-        <div className="absolute bottom-[60px] left-5 w-max max-w-[240px] -translate-x-1/2 rounded-2xl rounded-bl-md border border-line bg-surface px-3.5 py-2 text-xs leading-relaxed text-cream shadow-lg">
+        <div className="pal-say absolute bottom-[84px] left-6 w-max max-w-[240px] origin-bottom-left rounded-2xl rounded-bl-md border border-line bg-surface px-3.5 py-2 text-xs leading-relaxed text-cream shadow-lg">
           {fact}
         </div>
       ) : null}
       <div style={{ transform: `scaleX(${facing})` }}>
-        <PalFace />
+        <div className={fact ? "pal-idle" : "pal-hop"}>
+          <PalSvg width={48} walking={!fact} />
+        </div>
       </div>
     </div>
   );
