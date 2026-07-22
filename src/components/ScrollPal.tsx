@@ -6,31 +6,77 @@ import PalSvg from "./PalSvg";
 // Desktop-only scroll guide, scrollytelling style.
 //
 // The pal follows a hand-authored PATH: each section has a waypoint — a side
-// (which gutter he parks in) and a height (where on the screen he stands).
-// As you scroll he travels between waypoints along a gentle arc, leaning into
-// his stride and stepping with his leg, so it reads like a designed route
-// rather than a sprite sliding on a rail.
+// (which gutter he parks in) and a height (where on the screen he stands) —
+// plus a little pool of lines he cycles through.
 //
-// He always parks in the empty gutter beside the content column, sized to fit
-// that gutter, so he never stands on top of text or a button. His speech
-// bubble types out on arrival and stays up until he sets off for the next
-// stop. (Placeholder lines — the user will replace them.)
+// The trick that keeps him off the content: he stays parked in his gutter for
+// almost the whole section, and only crosses to the other side during the
+// brief window when the gap BETWEEN two sections is at the middle of the
+// screen — i.e. he steps across through empty whitespace, never over text or
+// buttons. Stop scrolling anywhere and he settles in a gutter, never mid-page.
+// (Placeholder lines — the user will replace them.)
 const STOPS = [
-  { id: "hero", side: "left" as const, y: 0.5, line: "hey — i'm the paperclip. i hold this whole thing together." },
-  { id: "features", side: "right" as const, y: 0.38, line: "no ads, no tracking, no catch. all of it, yours." },
-  { id: "why", side: "left" as const, y: 0.55, line: "remember when software was on your side? same." },
-  { id: "opensource", side: "right" as const, y: 0.42, line: "every line is public. read it, fork it, trust it." },
-  { id: "contact", side: "left" as const, y: 0.5, line: "that's the tour. built with a paperclip and stubbornness." },
+  {
+    id: "hero",
+    side: "left" as const,
+    y: 0.5,
+    lines: [
+      "hey — i'm the paperclip. i hold this whole thing together.",
+      "it looks like you're trying to leave big tech. want a hand?",
+      "one clip, zero data harvested. good start, right?",
+    ],
+  },
+  {
+    id: "features",
+    side: "right" as const,
+    y: 0.42,
+    lines: [
+      "no ads, no tracking, no catch. all of it, yours.",
+      "encrypted on your phone, unreadable everywhere else.",
+      "no phone number, no real name, no problem.",
+    ],
+  },
+  {
+    id: "why",
+    side: "left" as const,
+    y: 0.54,
+    lines: [
+      "remember when software was on your side? same.",
+      "your feed used to be yours. let's do that again.",
+      "90s helpfulness, 2026 cryptography. weird mix, i know.",
+    ],
+  },
+  {
+    id: "opensource",
+    side: "right" as const,
+    y: 0.44,
+    lines: [
+      "every line is public. read it, fork it, trust it.",
+      "don't trust us — trust the code. it's all right there.",
+      "built in the open, by people who actually use it.",
+    ],
+  },
+  {
+    id: "contact",
+    side: "left" as const,
+    y: 0.5,
+    lines: [
+      "that's the tour. built with a paperclip and stubbornness.",
+      "stick around. or self-host. or both. i'm easy.",
+      "made with one clip and a grudge against ads.",
+    ],
+  },
 ];
 
 const CONTENT_W = 1152; // max-w-6xl — the pal lives in the gutter beside it
 const GAP = 12; // clearance between the pal and the content column
 const EDGE = 8; // clearance from the screen edge
+const smooth = (u: number) => u * u * (3 - 2 * u);
 
 export default function ScrollPal() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const palRef = useRef<HTMLDivElement>(null);
-  const [line, setLine] = useState(STOPS[0].line);
+  const [line, setLine] = useState(STOPS[0].lines[0]);
   const [bubbleRight, setBubbleRight] = useState(STOPS[0].side === "left");
   const [bubbleOn, setBubbleOn] = useState(true);
   const [typing, setTyping] = useState(true);
@@ -41,6 +87,9 @@ export default function ScrollPal() {
   const target = useRef({ x: 40, y: 0 });
   const cur = useRef({ x: 40, y: 0, lean: 0, facing: 1 as 1 | -1 });
   const palWRef = useRef(88);
+  const nearRef = useRef(STOPS[0]);
+  // first arrival at each stop shows lines[0]; each later visit advances
+  const lineIdx = useRef<Record<string, number>>({});
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -60,66 +109,82 @@ export default function ScrollPal() {
 
     // park just outside the content box: his content-facing edge stops a
     // GAP short of it, so text and buttons are never covered
-    const parkLeft = () =>
-      Math.max(EDGE, gutter() - GAP - palWRef.current);
+    const parkLeft = () => Math.max(EDGE, gutter() - GAP - palWRef.current);
     const parkRight = () =>
       Math.min(
         window.innerWidth - EDGE - palWRef.current,
         window.innerWidth - gutter() + GAP,
       );
-
     const stopX = (s: (typeof STOPS)[number]) =>
       s.side === "left" ? parkLeft() : parkRight();
-    // vertical offset from screen center for a waypoint's height anchor
-    const stopY = (s: (typeof STOPS)[number]) =>
-      (s.y - 0.5) * window.innerHeight;
 
     const computeTarget = () => {
       sizePal();
-      const vc = window.innerHeight / 2;
-      const pts: { center: number; stop: (typeof STOPS)[number] }[] = [];
+      const h = window.innerHeight;
+      const vc = h / 2;
+      const pts: {
+        center: number;
+        bottom: number;
+        stop: (typeof STOPS)[number];
+      }[] = [];
       for (const s of STOPS) {
         const el = document.getElementById(s.id);
         if (!el) continue;
         const r = el.getBoundingClientRect();
-        pts.push({ center: r.top + r.height / 2, stop: s });
+        pts.push({ center: r.top + r.height / 2, bottom: r.bottom, stop: s });
       }
       if (pts.length === 0) return;
 
       let near = pts[pts.length - 1].stop;
       let x = stopX(near);
-      let y = stopY(near);
+      let y = (near.y - 0.5) * h;
       // the footer can never reach the viewport center, so treat "scrolled
       // to the bottom" as arriving at the last stop
       const atBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 2;
-      if (atBottom) {
-        // settled at the last stop
-      } else if (vc <= pts[0].center) {
-        near = pts[0].stop;
+        h + window.scrollY >= document.documentElement.scrollHeight - 2;
+      if (atBottom || vc <= pts[0].center) {
+        near = atBottom ? pts[pts.length - 1].stop : pts[0].stop;
         x = stopX(near);
-        y = stopY(near);
+        y = (near.y - 0.5) * h;
       } else {
         for (let i = 0; i < pts.length - 1; i++) {
           const a = pts[i];
           const b = pts[i + 1];
           if (vc >= a.center && vc <= b.center) {
-            let t = (vc - a.center) / Math.max(b.center - a.center, 1);
+            const t = (vc - a.center) / Math.max(b.center - a.center, 1);
             near = t < 0.5 ? a.stop : b.stop;
-            t = t * t * (3 - 2 * t); // smoothstep: rest at stops, glide between
+
             const ax = stopX(a.stop);
             const bx = stopX(b.stop);
-            const ay = stopY(a.stop);
-            const by = stopY(b.stop);
-            x = ax + (bx - ax) * t;
-            y = ay + (by - ay) * t - Math.sin(t * Math.PI) * 26; // arced hop
+            const ay = (a.stop.y - 0.5) * h;
+            const by = (b.stop.y - 0.5) * h;
+
+            // where the gap between these two sections currently sits, as a
+            // fraction of the way from stop A to stop B
+            const tb = Math.min(
+              0.85,
+              Math.max(0.15, (a.bottom - a.center) / (b.center - a.center)),
+            );
+            // horizontal cross: pinned to A's side, then a quick step to B's
+            // side right as that gap passes the middle of the screen
+            const W = 0.16;
+            const hp = smooth(
+              Math.min(1, Math.max(0, (t - (tb - W)) / (2 * W))),
+            );
+            x = ax + (bx - ax) * hp;
+
+            // sit at his gutter height, but during the step pull toward the
+            // section gap (whitespace) so he crosses through empty space
+            const gapY = a.bottom - vc; // gap offset from screen center
+            const yStop = ay + (by - ay) * t;
+            const pull = Math.sin(hp * Math.PI);
+            y = yStop + (gapY - yStop) * pull - pull * 8; // tiny hop on top
             break;
           }
         }
       }
       target.current = { x, y };
-      setLine(near.line);
+      nearRef.current = near;
       setBubbleRight(near.side === "left");
     };
 
@@ -132,8 +197,8 @@ export default function ScrollPal() {
       const dx = target.current.x - c.x;
       // gentle ease with a speed cap so crossing the screen reads as a
       // stroll, never a teleport
-      let step = dx * 0.07;
-      const MAX = 6;
+      let step = dx * 0.08;
+      const MAX = 7;
       if (step > MAX) step = MAX;
       if (step < -MAX) step = -MAX;
       if (Math.abs(dx) > 0.4) c.x += step;
@@ -153,7 +218,12 @@ export default function ScrollPal() {
           // he sets off — put the bubble away until he arrives
           setBubbleOn(false);
         } else {
-          // arrived: type out the line, then hold it until he leaves again
+          // arrived: pick the next line from this stop's pool, type it out,
+          // then hold it until he leaves again
+          const s = nearRef.current;
+          const i = lineIdx.current[s.id] ?? 0;
+          setLine(s.lines[i % s.lines.length]);
+          lineIdx.current[s.id] = i + 1;
           setBubbleOn(true);
           setTyping(true);
           setArrivalId((n) => n + 1);
