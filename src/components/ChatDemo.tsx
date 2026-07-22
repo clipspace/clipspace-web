@@ -11,7 +11,7 @@ const SCRIPT: Msg[] = [
   { who: "them", text: "ok real question. ads in here?" },
   { who: "me", text: "none. you're not the product this time" },
   { who: "them", text: "my old group chat literally put an ad in the middle of a family argument" },
-  { who: "me", text: "yeah, that's the app you're leaving. not this one" },
+  { who: "me", text: "no ads in here. not even mid-argument" },
   { who: "them", text: "and nobody can read this? like actually?" },
   { who: "me", text: "i can't read it and i built it" },
   { who: "them", text: "even the server?" },
@@ -53,6 +53,14 @@ export default function ChatDemo() {
   const [sendPressed, setSendPressed] = useState(false);
   const idx = useRef(2);
   const nextKey = useRef(2);
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  // Keep the caret end in view as text is typed, like a real phone input
+  // scrolling left — no ellipsis, no truncation.
+  useEffect(() => {
+    const el = inputRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [inputText]);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -132,7 +140,10 @@ export default function ChatDemo() {
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="flex-1 truncate rounded-full border border-line px-4 py-2.5 text-sm">
+        <div
+          ref={inputRef}
+          className="flex-1 overflow-hidden whitespace-nowrap rounded-full border border-line px-4 py-2.5 text-sm"
+        >
           {inputText ? (
             <span className="text-cream">
               {inputText}
