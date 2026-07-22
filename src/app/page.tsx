@@ -169,7 +169,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-6 text-xs text-muted">
-              held together by a paperclip, not a corporation 📎
+              held together by a paperclip, not a corporation 🖇️
             </p>
           </div>
 
@@ -305,7 +305,7 @@ export default function Home() {
             <p className="mt-2 text-muted">
               generating your keys… done.
               <br />
-              welcome to your space.
+              welcome to your space. 🖇️
             </p>
           </div>
         </div>
