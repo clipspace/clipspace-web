@@ -14,7 +14,7 @@ export default function NotFound() {
         href="/"
         className="font-display rounded-full bg-brass px-6 py-3 font-bold text-bg transition-colors hover:bg-brass-soft"
       >
-        Back to clipspace
+        Back to ClipSpace
       </Link>
     </main>
   );

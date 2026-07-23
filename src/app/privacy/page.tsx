@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
-  title: "privacy policy – clipspace",
+  title: "privacy policy – ClipSpace",
   description:
-    "How the clipspace website handles your data: no cookies, no analytics, no trackers. Just server logs at our hosting provider.",
+    "How the ClipSpace website handles your data: no cookies, no analytics, no trackers. Just server logs at our hosting provider.",
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -128,7 +128,7 @@ export default function Privacy() {
 
         <Section title="Changes">
           <p>
-            If clipspace ever launches features that touch personal data (accounts,
+            If ClipSpace ever launches features that touch personal data (accounts,
             a waitlist), this policy will be updated first and the date above will
             change. The whole site is{" "}
             <a

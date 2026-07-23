@@ -111,7 +111,7 @@ export default function Home() {
               <span id="pal-hero-anchor" className="text-brass">Your keys.</span>
             </h1>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
-              Clipspace is a social network that belongs to the people on it.
+              ClipSpace is a social network that belongs to the people on it.
               Everything is encrypted end to end, the code is public, and it
               costs nothing. We couldn&apos;t read your messages if we tried,
               which is exactly the point.
@@ -190,7 +190,7 @@ export default function Home() {
           </Feature>
           <Feature icon="nophone" title="No phone number">
             Sign up without a phone number or real name. Who you are on
-            clipspace is up to you.
+            ClipSpace is up to you.
           </Feature>
         </div>
       </section>
@@ -219,7 +219,7 @@ export default function Home() {
               asset.
             </p>
             <p className="mt-4 max-w-2xl leading-relaxed text-muted">
-              Clipspace is our way back: the earnest, slightly dorky
+              ClipSpace is our way back: the earnest, slightly dorky
               helpfulness of 90s software with the cryptography of 2026. It
               looks like you&apos;re trying to talk to your friends in
               private. We can help with that.
@@ -286,7 +286,7 @@ export default function Home() {
               Built in the open.
             </h2>
             <p className="mt-5 leading-relaxed text-muted">
-              Clipspace is being built right now, in public, on GitHub.
+              ClipSpace is being built right now, in public, on GitHub.
               It&apos;s not ready yet. Star the repo to follow along, open
               issues, send patches, or just watch us bend the wire into
               shape.
@@ -334,7 +334,7 @@ export default function Home() {
                 First version for Android
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">
-                The first clipspace app is being built for Android right now,
+                The first ClipSpace app is being built for Android right now,
                 and we&apos;re working toward going public with the first
                 version of the server alongside it.
               </p>
@@ -364,7 +364,7 @@ export default function Home() {
             Free. Open source. Encrypted. Yours.
           </p>
           <p className="text-xs text-muted">
-            © 2026 clipspace · made with 🖇️ and stubbornness
+            © 2026 ClipSpace · made with 🖇️ and stubbornness
           </p>
           <p className="text-xs text-muted">
             <a href="/privacy" className="hover:text-brass hover:underline">Privacy</a>

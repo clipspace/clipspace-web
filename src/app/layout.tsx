@@ -17,9 +17,9 @@ const instrument = Instrument_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://clipspace.djt-group.com"),
-  title: "clipspace – your space, your people, your keys",
+  title: "ClipSpace – your space, your people, your keys",
   description:
-    "Clipspace is a free, open-source, end-to-end encrypted social network. No ads, no tracking, no big tech. Held together by a paperclip.",
+    "ClipSpace is a free, open-source, end-to-end encrypted social network. No ads, no tracking, no big tech. Held together by a paperclip.",
 };
 
 export default function RootLayout({

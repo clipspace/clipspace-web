@@ -1,4 +1,4 @@
-// Clipspace logo – a speech bubble bent from a single paperclip wire.
+// ClipSpace logo – a speech bubble bent from a single paperclip wire.
 // The wire enters at the tail, wraps the bubble, and curls inward like
 // a paperclip coil. Brass wire, cream dots.
 
@@ -18,7 +18,7 @@ export function LogoIcon({
       viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="Clipspace logo"
+      aria-label="ClipSpace logo"
     >
       {/* one continuous wire: tail → around the bubble → inner coil */}
       <path
@@ -53,9 +53,9 @@ export function LogoIcon({
 
 export function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <span className={`font-display font-bold tracking-tight lowercase ${className}`}>
-      <span className="text-cream">clip</span>
-      <span className="text-brass">space</span>
+    <span className={`font-display font-bold tracking-tight ${className}`}>
+      <span className="text-cream">Clip</span>
+      <span className="text-brass">Space</span>
     </span>
   );
 }
