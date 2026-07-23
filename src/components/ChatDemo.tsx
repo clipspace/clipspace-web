@@ -44,7 +44,7 @@ const GENZ: Msg[] = [
 const SCRIPTS = [CLASSIC, GENZ];
 
 const WINDOW = 4;
-const PLACEHOLDER = "Message tommy…";
+const PLACEHOLDER = "Message bro…";
 
 function Bubble({ who, children }: { who: "them" | "me"; children: React.ReactNode }) {
   return (

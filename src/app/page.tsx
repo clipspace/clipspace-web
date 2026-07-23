@@ -141,10 +141,10 @@ export default function Home() {
               <div className="flex items-center justify-between border-b border-line pb-4">
                 <div className="flex items-center gap-3">
                   <div className="font-display flex h-8 w-8 items-center justify-center rounded-full border border-brass/40 bg-brass/15 text-sm font-bold text-brass">
-                    t
+                    b
                   </div>
                   <div>
-                    <p className="font-display text-sm font-bold">tommy</p>
+                    <p className="font-display text-sm font-bold">bro</p>
                     <p className="text-xs text-muted">online · encrypted</p>
                   </div>
                 </div>
