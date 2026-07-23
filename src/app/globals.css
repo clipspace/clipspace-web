@@ -41,6 +41,18 @@ html {
   scroll-behavior: smooth;
 }
 
+/* big screens get a gentle zoom: the whole layout is rem-based, so scaling
+   the root font size scales everything up and shrinks the empty margins */
+@media (min-width: 1400px) {
+  html { font-size: 17px; }
+}
+@media (min-width: 1700px) {
+  html { font-size: 18px; }
+}
+@media (min-width: 2000px) {
+  html { font-size: 19px; }
+}
+
 /* scroll-reveal — only active once JS marks the doc ready, so content
    is never hidden without JS */
 .reveal-ready [data-reveal] {
