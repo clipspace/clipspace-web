@@ -108,7 +108,7 @@ export default function Home() {
               <br />
               Your people.
               <br />
-              <span className="text-brass">Your keys.</span>
+              <span id="pal-hero-anchor" className="text-brass">Your keys.</span>
             </h1>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
               Clipspace is a social network that belongs to the people on it.
@@ -161,9 +161,11 @@ export default function Home() {
       {/* features */}
       <section id="features" className="mx-auto max-w-6xl px-6 py-20">
         <h2 className="font-display text-center text-3xl font-bold md:text-4xl" data-reveal>
-          Everything a social network should be.
-          <br />
-          <span className="text-muted">Nothing it shouldn&apos;t.</span>
+          <span id="pal-features-anchor">
+            Everything a social network should be.
+            <br />
+            <span className="text-muted">Nothing it shouldn&apos;t.</span>
+          </span>
         </h2>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-reveal-stagger>
           <Feature icon="lock" title="End-to-end encrypted">
@@ -206,7 +208,7 @@ export default function Home() {
             </div>
           </div>
           <div data-reveal>
-            <h2 className="font-display text-3xl font-bold md:text-4xl">
+            <h2 id="pal-why-anchor" className="font-display text-3xl font-bold md:text-4xl">
               Remember when software was on <em>your</em> side?
             </h2>
             <p className="mt-5 max-w-2xl leading-relaxed text-muted">
@@ -296,7 +298,7 @@ export default function Home() {
               Star on GitHub ↗
             </a>
           </div>
-          <div className="rounded-xl border border-line bg-surface p-6 font-mono text-sm leading-relaxed" data-reveal>
+          <div id="pal-open-anchor" className="rounded-xl border border-line bg-surface p-6 font-mono text-sm leading-relaxed" data-reveal>
             <p className="text-muted"># coming soon</p>
             <p className="mt-2">
               <span className="text-brass">$</span> git clone
@@ -321,7 +323,7 @@ export default function Home() {
       <section id="news" className="border-t border-line bg-surface">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className="font-display text-3xl font-bold md:text-4xl" data-reveal>
-            What&apos;s new?
+            <span id="pal-news-anchor">What&apos;s new?</span>
           </h2>
           <div className="mt-10 grid gap-5 md:grid-cols-2" data-reveal-stagger>
             <div className="rounded-xl border border-line bg-bg p-6">

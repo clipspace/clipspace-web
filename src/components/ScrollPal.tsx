@@ -5,23 +5,24 @@ import PalSvg from "./PalSvg";
 
 // Desktop-only scroll guide.
 //
-// He only ever *targets* a parking spot in a side gutter — never a point in
-// between. Whatever the scroll does (anchor clicks, scrubbing, stopping
-// mid-way), when he comes to rest he is standing beside the content, not on
-// it. The walk between spots is a time-based ease in screen space.
+// Every stop is ANCHORED to a real element on the page — he stands next to
+// the hero headline, next to the features heading, by the press clippings,
+// by the terminal card, by the news heading — and rides along with it as
+// the page scrolls. Walking from one anchor to the next is what gives the
+// run a reason: he's off to the next thing worth pointing at.
 //
-// The bubble sits ABOVE his head and grows toward the screen edge, so it
-// lives entirely in the gutter and never covers text. It only appears while
-// he stands still.
+// He still only ever *targets* a resting spot (never a point in between),
+// so stopping mid-scroll can't strand him on top of content. The bubble
+// sits above his head and grows away from whatever he's standing next to.
 //
-// Shown only on screens ≥1600px, where the gutter is wide enough for him
-// and his bubble; below that the static pal in the "why" section takes over.
-// (Placeholder lines — the user will replace them.)
+// Shown only on screens ≥1600px; below that the static pal in the "why"
+// section takes over. (Placeholder lines — the user will replace them.)
 const STOPS = [
   {
     id: "hero",
-    side: "left" as const,
-    y: 0.5,
+    anchor: "pal-hero-anchor",
+    place: "beside" as const, // right of "Your keys.", in the headline's air
+    gap: 96, // clear the longer "Your people." line above him
     lines: [
       "hey — i'm clip pal. i hold this whole thing together.",
       "it looks like you're trying to leave big tech. want a hand?",
@@ -30,8 +31,8 @@ const STOPS = [
   },
   {
     id: "features",
-    side: "right" as const,
-    y: 0.42,
+    anchor: "pal-features-anchor",
+    place: "beside" as const,
     lines: [
       "no ads, no tracking, no catch. all of it, yours.",
       "encrypted on your phone, unreadable everywhere else.",
@@ -40,8 +41,8 @@ const STOPS = [
   },
   {
     id: "why",
-    side: "left" as const,
-    y: 0.54,
+    anchor: "pal-why-anchor",
+    place: "gutter-left" as const,
     lines: [
       "remember when software was on your side? same.",
       "your feed used to be yours. let's do that again.",
@@ -50,8 +51,8 @@ const STOPS = [
   },
   {
     id: "opensource",
-    side: "left" as const,
-    y: 0.44,
+    anchor: "pal-open-anchor",
+    place: "gutter-right" as const,
     lines: [
       "every line is public. read it, fork it, trust it.",
       "don't trust us — trust the code. it's all right there.",
@@ -60,8 +61,8 @@ const STOPS = [
   },
   {
     id: "news",
-    side: "right" as const,
-    y: 0.46,
+    anchor: "pal-news-anchor",
+    place: "beside" as const,
     lines: [
       "fresh off the press: android comes first.",
       "that's the tour. built with a paperclip and stubbornness.",
@@ -120,7 +121,6 @@ export default function ScrollPal() {
         palWRef.current = w;
         setPalW(w);
       }
-      setBubbleW(Math.round(Math.max(150, Math.min(260, gutter() - 20))));
     };
 
     // park just outside the content box: his content-facing edge stops a
@@ -131,8 +131,6 @@ export default function ScrollPal() {
         window.innerWidth - EDGE - palWRef.current,
         window.innerWidth - gutter() + GAP,
       );
-    const stopX = (s: (typeof STOPS)[number]) =>
-      s.side === "left" ? parkLeft() : parkRight();
 
     const computeTarget = () => {
       sizePal();
@@ -167,17 +165,47 @@ export default function ScrollPal() {
         h + window.scrollY >= document.documentElement.scrollHeight - 2;
       if (atBottom) near = STOPS[STOPS.length - 1];
 
-      target.current = { x: stopX(near), y: (near.y - 0.5) * h };
+      const pw = palWRef.current;
+      const a = document.getElementById(near.anchor)?.getBoundingClientRect();
+
+      // where he stands: next to his anchor element, or in a gutter beside it
+      let x: number;
+      if (near.place === "gutter-left") x = parkLeft();
+      else if (near.place === "gutter-right") x = parkRight();
+      else if (a)
+        x = Math.min(
+          window.innerWidth - EDGE - pw,
+          a.right + ("gap" in near && near.gap ? near.gap : 26),
+        );
+      else x = parkLeft();
+
+      // ...and at his anchor's height, riding along as the page scrolls,
+      // but never drifting off screen
+      const yCenter = a ? a.top + a.height / 2 : vc;
+      const yLimit = h / 2 - 150;
+      const y = Math.max(-yLimit, Math.min(yLimit, yCenter - vc));
+
+      target.current = { x, y };
       nearRef.current = near;
-      setLeftGutter(near.side === "left");
+      setLeftGutter(near.place === "gutter-left");
+      // the bubble grows away from whatever he stands next to
+      const space =
+        near.place === "gutter-left"
+          ? x + pw - EDGE
+          : window.innerWidth - x - pw - EDGE;
+      setBubbleW(Math.round(Math.max(150, Math.min(260, space))));
     };
 
     let raf = 0;
     let wasWalking = false;
     let shownStop: string | null = null; // stop whose line the bubble shows
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
+    let frame = 0;
 
     const loop = () => {
+      // re-measure a few times a second: reveal animations and layout
+      // shifts move the anchors without firing a scroll event
+      if (++frame % 20 === 0) computeTarget();
       const c = cur.current;
       const dx = target.current.x - c.x;
       // gentle ease with a speed cap so crossing the screen reads as a
@@ -187,7 +215,13 @@ export default function ScrollPal() {
       if (step > MAX) step = MAX;
       if (step < -MAX) step = -MAX;
       if (Math.abs(dx) > 0.4) c.x += step;
-      c.y += (target.current.y - c.y) * 0.1;
+      // capped vertical follow: he lags a touch behind fast scrolls and
+      // catches up, like he's actually running after his anchor
+      let stepY = (target.current.y - c.y) * 0.1;
+      const MAXY = 14;
+      if (stepY > MAXY) stepY = MAXY;
+      if (stepY < -MAXY) stepY = -MAXY;
+      c.y += stepY;
 
       // lean into the stride, straighten out when idle
       const leanTarget = Math.max(-9, Math.min(9, step * 1.6));
