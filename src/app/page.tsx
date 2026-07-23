@@ -1,4 +1,4 @@
-import { Logo, LogoIcon } from "@/components/Logo";
+import { Logo } from "@/components/Logo";
 import ChatDemo from "@/components/ChatDemo";
 import PalSvg from "@/components/PalSvg";
 
@@ -89,7 +89,7 @@ export default function Home() {
           <a href="#opensource" className="transition-colors hover:text-cream">Open source</a>
         </nav>
         <a
-          href="https://github.com/OckoTajny/clipspace-web"
+          href="https://github.com/clipspace/clipspace-web"
           className="rounded-full border border-line px-4 py-2 text-sm text-cream transition-colors hover:border-brass hover:text-brass"
         >
           GitHub ↗
@@ -140,10 +140,12 @@ export default function Home() {
             <div className="animate-float rounded-2xl border border-line bg-surface p-5">
               <div className="flex items-center justify-between border-b border-line pb-4">
                 <div className="flex items-center gap-3">
-                  <LogoIcon size={28} />
+                  <div className="font-display flex h-8 w-8 items-center justify-center rounded-full border border-brass/40 bg-brass/15 text-sm font-bold text-brass">
+                    t
+                  </div>
                   <div>
-                    <p className="font-display text-sm font-bold">weekend crew</p>
-                    <p className="text-xs text-muted">4 people · encrypted</p>
+                    <p className="font-display text-sm font-bold">tommy</p>
+                    <p className="text-xs text-muted">online · encrypted</p>
                   </div>
                 </div>
                 <span className="rounded-full border border-brass/40 px-2.5 py-1 text-xs font-medium text-brass">
@@ -288,7 +290,7 @@ export default function Home() {
               shape.
             </p>
             <a
-              href="https://github.com/OckoTajny/clipspace-web"
+              href="https://github.com/clipspace/clipspace-web"
               className="font-display mt-8 inline-block rounded-full border border-line px-6 py-3 font-bold transition-colors hover:border-brass hover:text-brass"
             >
               Star on GitHub ↗
@@ -365,7 +367,7 @@ export default function Home() {
           <p className="text-xs text-muted">
             <a href="/privacy" className="hover:text-brass hover:underline">Privacy</a>
             {" · "}
-            <a href="https://github.com/OckoTajny/clipspace-web" className="hover:text-brass hover:underline">GitHub</a>
+            <a href="https://github.com/clipspace/clipspace-web" className="hover:text-brass hover:underline">GitHub</a>
             {" · "}
             <a href="mailto:jachym@djt-group.com" className="hover:text-brass hover:underline">Contact</a>
           </p>

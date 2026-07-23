@@ -132,7 +132,7 @@ export default function Privacy() {
             a waitlist), this policy will be updated first and the date above will
             change. The whole site is{" "}
             <a
-              href="https://github.com/OckoTajny/clipspace-web"
+              href="https://github.com/clipspace/clipspace-web"
               className="text-brass hover:underline"
               rel="noopener noreferrer"
             >
