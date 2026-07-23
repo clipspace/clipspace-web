@@ -221,44 +221,54 @@ export default function Home() {
               private. We can help with that.
             </p>
           </div>
-          {/* wide screens only: a little 90s assistant window to keep the
-              right half company (the walking pal handles the left gutter) */}
+          {/* wide screens only: a stack of real press clippings — other
+              people saying the same thing, held together by the clip */}
           <div className="hidden min-[1600px]:block" data-reveal>
-            <div className="rounded-xl border border-line bg-surface-2 shadow-lg">
-              <div className="flex items-center justify-between rounded-t-xl border-b border-line px-4 py-2.5">
-                <p className="font-display text-xs font-bold tracking-wide text-muted">
-                  clipspace assistant
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+              don&apos;t just take our word for it
+            </p>
+            <div className="mt-6 space-y-4">
+              <a
+                href="https://jacobin.com/2025/10/internet-enshittification-antitrust-tech-doctorow"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block -rotate-1 rounded-lg border border-line bg-surface-2 px-5 py-4 shadow-lg transition-all hover:rotate-0 hover:border-brass/40"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
+                  Jacobin
                 </p>
-                <div className="flex gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full border border-line" />
-                  <span className="h-2.5 w-2.5 rounded-full border border-line" />
-                  <span className="h-2.5 w-2.5 rounded-full border border-line bg-brass/60" />
-                </div>
-              </div>
-              <div className="flex items-start gap-6 px-7 py-7">
-                <div className="pal-idle shrink-0">
-                  <PalSvg width={46} />
-                </div>
-                <div>
-                  <p className="leading-relaxed">
-                    It looks like you&apos;re trying to leave big tech behind.
-                  </p>
-                  <p className="mt-1 text-sm text-muted">
-                    Would you like help with that?
-                  </p>
-                  <div className="mt-6 flex gap-3">
-                    <a
-                      href="#opensource"
-                      className="font-display whitespace-nowrap rounded-full bg-brass px-4 py-2 text-sm font-bold text-bg transition-colors hover:bg-brass-soft"
-                    >
-                      Yes, help me
-                    </a>
-                    <span className="font-display whitespace-nowrap rounded-full border border-line px-4 py-2 text-sm font-bold text-muted">
-                      Don&apos;t show this again
-                    </span>
-                  </div>
-                </div>
-              </div>
+                <p className="font-display mt-1.5 font-bold leading-snug">
+                  How to save the internet from &ldquo;enshittification&rdquo;
+                </p>
+              </a>
+              <a
+                href="https://www.vice.com/en/article/targeted-advertising-is-ruining-the-internet-and-breaking-the-world/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rotate-[1.2deg] rounded-lg border border-line bg-surface-2 px-5 py-4 shadow-lg transition-all hover:rotate-0 hover:border-brass/40"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
+                  VICE
+                </p>
+                <p className="font-display mt-1.5 font-bold leading-snug">
+                  Targeted advertising is ruining the internet and breaking
+                  the world
+                </p>
+              </a>
+              <a
+                href="https://privacyinternational.org/long-read/2967/ad-supported-internet-broken-inefficient-and-privacy-nightmare-lets-fix-it"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block -rotate-[0.6deg] rounded-lg border border-line bg-surface-2 px-5 py-4 shadow-lg transition-all hover:rotate-0 hover:border-brass/40"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
+                  Privacy International
+                </p>
+                <p className="font-display mt-1.5 font-bold leading-snug">
+                  The ad-supported internet is broken, inefficient and a
+                  privacy nightmare
+                </p>
+              </a>
             </div>
           </div>
         </div>
@@ -317,23 +327,25 @@ export default function Home() {
                 in progress
               </span>
               <h3 className="font-display mt-4 text-lg font-bold">
-                Deep in development
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                The core of clipspace — encryption, spaces, servers — is being
-                built right now. Follow the repo to watch it take shape.
-              </p>
-            </div>
-            <div className="rounded-xl border border-line bg-bg p-6">
-              <span className="rounded-full border border-brass/40 px-2.5 py-1 text-xs font-medium text-brass">
-                coming soon
-              </span>
-              <h3 className="font-display mt-4 text-lg font-bold">
                 First version for Android
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">
-                The first clipspace app is headed to Android. Other platforms
-                will follow.
+                The first clipspace app is being built for Android right now,
+                and we&apos;re working toward going public with the first
+                version of the server alongside it.
+              </p>
+            </div>
+            <div className="rounded-xl border border-line bg-bg p-6">
+              <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-muted">
+                planned
+              </span>
+              <h3 className="font-display mt-4 text-lg font-bold">
+                iOS, web &amp; desktop
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                A version for Apple devices will be released sometime in the
+                future, along with a web version and desktop apps for Windows
+                and Linux. But right now, Android is the one on its way.
               </p>
             </div>
           </div>
