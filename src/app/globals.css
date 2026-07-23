@@ -145,7 +145,7 @@ html {
   transform-origin: 15px 63px;
 }
 .pal-walking .pal-leg {
-  animation: pal-leg-step 0.45s ease-in-out infinite;
+  animation: pal-leg-step 0.36s ease-in-out infinite;
 }
 @keyframes pal-leg-step {
   0%, 100% { transform: rotate(0deg); }
@@ -201,7 +201,7 @@ html {
   50% { transform: translateY(0) rotate(0deg); }
   75% { transform: translateY(-3px) rotate(3deg); }
 }
-.pal-walk { animation: pal-walk 0.5s ease-in-out infinite; transform-origin: 50% 92%; }
+.pal-walk { animation: pal-walk 0.4s ease-in-out infinite; transform-origin: 50% 92%; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

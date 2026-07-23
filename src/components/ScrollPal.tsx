@@ -182,8 +182,8 @@ export default function ScrollPal() {
       const dx = target.current.x - c.x;
       // gentle ease with a speed cap so crossing the screen reads as a
       // stroll, never a teleport
-      let step = dx * 0.08;
-      const MAX = 7;
+      let step = dx * 0.11;
+      const MAX = 11;
       if (step > MAX) step = MAX;
       if (step < -MAX) step = -MAX;
       if (Math.abs(dx) > 0.4) c.x += step;
