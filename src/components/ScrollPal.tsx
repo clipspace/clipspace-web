@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import PalSvg from "./PalSvg";
 
-// Desktop-only scroll guide, with two moods.
+// Desktop-only scroll guide, in four moods.
 //
 // GUIDE (default) — he only ever *targets* a parking spot in a side gutter,
 // never a point in between. Whatever the scroll does (anchor clicks,
@@ -16,9 +17,19 @@ import PalSvg from "./PalSvg";
 // he stands still.
 //
 // AFK — once the page has been still for a while (no mouse, no keys, no
-// scroll), he clocks off and goes wandering: he strolls to a random spot
-// anywhere on the screen, stops, says something to nobody in particular, and
-// moves on. The first sign of life sends him straight back to his post.
+// scroll) and someone is actually looking at it, he clocks off and goes
+// wandering: he strolls to a random spot anywhere on the screen, stops, says
+// something to nobody in particular, and moves on. He walks the room in fake
+// perspective too — the further back he goes the higher up the screen and
+// the smaller he gets, and the shorter his strides look. The first sign of
+// life sends him back to his post.
+//
+// PARKED — he can be grabbed and dragged anywhere, for when he's standing in
+// front of something you want to read. He stays where he's dropped until the
+// next scroll puts him back on the job.
+//
+// LEAVING — dragged off a screen edge, or sent away with the × on his
+// shoulder: he walks off the nearest edge and is gone until the page reloads.
 //
 // Shown only on screens ≥1600px, where the gutter is wide enough for him
 // and his bubble; below that the static pal in the "why" section takes over.
@@ -92,9 +103,21 @@ const AFK_LINES = [
   "just doing a lap. carry on whenever you're ready.",
 ];
 
+// ...and what he says about being picked up and put somewhere else
+const PARKED_LINES = [
+  "here? sure. here is fine.",
+  "sorry — was i in the way?",
+  "put me down anywhere, i'm not fussy.",
+];
+
 const GAP = 12; // clearance between the pal and the content column
 const EDGE = 8; // clearance from the screen edge
-const IDLE_MS = 20000; // quiet time before he clocks off and wanders
+const IDLE_MS = 12000; // quiet time before he clocks off and wanders
+const FAR = 0.82; // how small he gets at the back of the room
+const NEAR = 1.28; // ...and how big right up front
+const PULL_OFF = 46; // dropped this close to an edge means "off you go"
+
+type Mode = "guide" | "afk" | "parked" | "leaving";
 
 export default function ScrollPal() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -105,20 +128,28 @@ export default function ScrollPal() {
   const [typing, setTyping] = useState(true);
   const [arrivalId, setArrivalId] = useState(0);
   const [walking, setWalking] = useState(false);
+  const [held, setHeld] = useState(false);
+  const [gone, setGone] = useState(false);
   const [palW, setPalW] = useState(88);
   const [bubbleW, setBubbleW] = useState(240);
   const [bubSize, setBubSize] = useState<{ w: number; h: number } | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const target = useRef({ x: 40, y: 0 });
-  const cur = useRef({ x: 40, y: 0, lean: 0, facing: 1 as 1 | -1 });
+  const target = useRef({ x: 40, y: 0, s: 1 });
+  const cur = useRef({ x: 40, y: 0, s: 1, lean: 0, facing: 1 as 1 | -1 });
   const palWRef = useRef(88);
+  const mode = useRef<Mode>("guide");
+  const drag = useRef({ on: false, ox: 0, oy: 0 });
   // where he's headed and what he'll say once he gets there — the line is
   // picked when the destination is chosen, not on arrival
   const spot = useRef({ key: STOPS[0].id, line: STOPS[0].lines[0] });
-  const afk = useRef(false);
   // first arrival at each stop shows lines[0]; each later visit advances
   const lineIdx = useRef<Record<string, number>>({});
+  // handles the pal's own pointer handlers reach into
+  const api = useRef<{
+    grab: (e: ReactPointerEvent) => void;
+    sendAway: () => void;
+  } | null>(null);
 
   // measure the bubble's content so the box itself can smoothly grow from
   // the little typing bubble into the full line (width/height transition)
@@ -136,6 +167,7 @@ export default function ScrollPal() {
     const contentW = () =>
       72 * parseFloat(getComputedStyle(document.documentElement).fontSize);
     const gutter = () => Math.max(0, (window.innerWidth - contentW()) / 2);
+    const palH = () => (palWRef.current * 80) / 50;
 
     const sizePal = () => {
       // as big as the gutter can hold, within a sensible range
@@ -159,30 +191,44 @@ export default function ScrollPal() {
       s.side === "left" ? parkLeft() : parkRight();
 
     // one line per destination: stops rotate through their own lines, the
-    // wander pulls from a shuffled bag so he doesn't repeat himself
+    // wander and the drop pull from shuffled bags so he doesn't repeat
     const stopLine = (s: (typeof STOPS)[number]) => {
       const i = lineIdx.current[s.id] ?? 0;
       lineIdx.current[s.id] = i + 1;
       return s.lines[i % s.lines.length];
     };
-    let afkBag: string[] = [];
-    const afkLine = () => {
-      if (afkBag.length === 0) {
-        afkBag = AFK_LINES.slice();
-        for (let i = afkBag.length - 1; i > 0; i--) {
+    const bags = new Map<string[], string[]>();
+    const fromBag = (src: string[]) => {
+      let bag = bags.get(src);
+      if (!bag || bag.length === 0) {
+        bag = src.slice();
+        for (let i = bag.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [afkBag[i], afkBag[j]] = [afkBag[j], afkBag[i]];
+          [bag[i], bag[j]] = [bag[j], bag[i]];
         }
+        bags.set(src, bag);
       }
-      return afkBag.pop() as string;
+      return bag.pop() as string;
     };
     const aimAt = (key: string, pickLine: () => string) => {
       if (spot.current.key !== key) spot.current = { key, line: pickLine() };
     };
 
+    // the bubble hangs off whichever of his shoulders has the room. `cx` is
+    // the middle of him, `s` how big he currently is
+    const aimBubble = (cx: number, s: number) => {
+      const w = window.innerWidth;
+      const hw = (palWRef.current * s) / 2;
+      const toLeft = cx > w / 2;
+      setLeftGutter(toLeft);
+      const room = (toLeft ? cx + hw : w - cx + hw) - EDGE;
+      // it is scaled along with him, so budget in his own units
+      setBubbleW(Math.round(Math.max(150, Math.min(260, room / s))));
+    };
+
     const computeTarget = () => {
       sizePal();
-      if (afk.current) return; // off duty: the wander owns his target
+      if (mode.current !== "guide") return; // he's off doing something else
       const h = window.innerHeight;
       const vc = h / 2;
 
@@ -214,8 +260,8 @@ export default function ScrollPal() {
         h + window.scrollY >= document.documentElement.scrollHeight - 2;
       if (atBottom) near = STOPS[STOPS.length - 1];
 
-      target.current = { x: stopX(near), y: (near.y - 0.5) * h };
       const stop = near;
+      target.current = { x: stopX(stop), y: (stop.y - 0.5) * h, s: 1 };
       aimAt(stop.id, () => stopLine(stop));
       setLeftGutter(stop.side === "left");
       setBubbleW(Math.round(Math.max(150, Math.min(260, gutter() - 20))));
@@ -226,85 +272,177 @@ export default function ScrollPal() {
     let shownSpot: string | null = null; // destination whose line is showing
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
     let idleTimer: ReturnType<typeof setTimeout> | undefined;
+    let goneTimer: ReturnType<typeof setTimeout> | undefined;
     let nextRoamAt = Infinity; // when he sets off for the next wander spot
     let roamN = 0;
 
-    // pick somewhere new to stand — anywhere on the screen, far enough away
-    // to be worth the walk, with his head (and bubble) kept on screen
+    // pick somewhere new to stand — anywhere on the screen, near or far,
+    // far enough away to be worth the walk
     const roam = () => {
       sizePal();
       const pw = palWRef.current;
-      const ph = (pw * 80) / 50;
+      const ph = palH();
       const w = window.innerWidth;
       const h = window.innerHeight;
 
-      const minX = EDGE;
-      const maxX = Math.max(EDGE, w - EDGE - pw);
-      let x = minX + Math.random() * (maxX - minX);
-      if (Math.abs(x - cur.current.x) < w * 0.22) {
+      // depth: 0 is the back of the room, 1 is right up against the glass.
+      // further back = higher up the screen and smaller, so walking between
+      // depths reads as coming toward you or going away
+      const d = Math.random();
+      const s = FAR + d * (NEAR - FAR);
+      const footY = h * (0.32 + d * 0.6);
+      const y = footY - h / 2 - ph / 2;
+
+      // ...and anywhere across the width
+      const hw = (pw * s) / 2;
+      const minC = EDGE + hw;
+      const maxC = Math.max(minC, w - EDGE - hw);
+      const from = cur.current.x + pw / 2;
+      let cx = minC + Math.random() * (maxC - minC);
+      if (Math.abs(cx - from) < w * 0.22) {
         // too close to be a walk — send him across instead of shuffling
         const far = w * (0.3 + Math.random() * 0.4);
-        x = cur.current.x < w / 2 ? cur.current.x + far : cur.current.x - far;
-        x = Math.max(minX, Math.min(maxX, x));
+        cx = Math.max(minC, Math.min(maxC, from < w / 2 ? from + far : from - far));
       }
 
-      // y is measured from the vertical middle of the viewport; leave room
-      // above his head for the bubble
-      const up = Math.max(0, h / 2 - ph / 2 - 104);
-      const down = Math.max(0, h / 2 - ph / 2 - 28);
-      const y = -up + Math.random() * (up + down);
-
-      target.current = { x, y };
-      aimAt(`afk-${++roamN}`, afkLine);
+      target.current = { x: cx - pw / 2, y, s };
+      aimAt(`afk-${++roamN}`, () => fromBag(AFK_LINES));
       nextRoamAt = Infinity; // rescheduled once he arrives and speaks
-      // out here there is no gutter: the bubble grows toward the roomier side
-      const toLeft = x + pw / 2 > w / 2;
-      setLeftGutter(toLeft);
-      // it hangs from his right edge going left, or his left edge going right
-      const room = toLeft ? x + pw - EDGE : w - x - EDGE;
-      setBubbleW(Math.round(Math.max(150, Math.min(260, room))));
+      aimBubble(cx, s);
     };
 
     const goAfk = () => {
-      if (afk.current) return;
-      afk.current = true;
+      if (mode.current === "afk" || mode.current === "leaving") return;
+      if (document.hidden) return; // no show without an audience
+      mode.current = "afk";
       roam();
     };
 
-    // any sign of life puts him back on the job and restarts the clock
-    const wake = () => {
+    const idleMs = () =>
+      // #afk in the url makes the wander easy to see without the wait
+      window.location.hash === "#afk" ? 2000 : IDLE_MS;
+    const restartIdleClock = () => {
       clearTimeout(idleTimer);
-      idleTimer = setTimeout(goAfk, IDLE_MS);
-      if (afk.current) {
-        afk.current = false;
+      if (mode.current !== "leaving") idleTimer = setTimeout(goAfk, idleMs());
+    };
+
+    // a sign of life: back to the job, and the idle clock starts over
+    const wake = () => {
+      restartIdleClock();
+      if (mode.current === "afk") {
+        mode.current = "guide";
         nextRoamAt = Infinity;
         computeTarget();
       }
     };
 
+    // send him off the nearest edge, for good
+    const sendAway = () => {
+      if (mode.current === "leaving") return;
+      mode.current = "leaving";
+      clearTimeout(idleTimer);
+      clearTimeout(typeTimer);
+      setBubbleOn(false);
+      const pw = palWRef.current;
+      const w = window.innerWidth;
+      const off = cur.current.x + pw / 2 < w / 2 ? -pw - 60 : w + 60;
+      target.current = { x: off, y: cur.current.y, s: cur.current.s };
+      goneTimer = setTimeout(() => setGone(true), 2600);
+    };
+
+    // --- being carried ------------------------------------------------
+    const onGrab = (e: ReactPointerEvent) => {
+      if (mode.current === "leaving") return;
+      (e.target as Element).setPointerCapture?.(e.pointerId);
+      e.preventDefault();
+      mode.current = "parked";
+      drag.current = {
+        on: true,
+        ox: e.clientX - cur.current.x,
+        oy: e.clientY - (window.innerHeight / 2 + cur.current.y),
+      };
+      clearTimeout(typeTimer);
+      setBubbleOn(false);
+      setHeld(true);
+      shownSpot = null;
+      nextRoamAt = Infinity;
+      clearTimeout(idleTimer);
+    };
+
+    const onDragMove = (e: PointerEvent) => {
+      if (!drag.current.on) return;
+      const c = cur.current;
+      const nx = e.clientX - drag.current.ox;
+      if (Math.abs(nx - c.x) > 1) c.facing = nx > c.x ? 1 : -1;
+      c.x = nx;
+      c.y = e.clientY - window.innerHeight / 2 - drag.current.oy;
+      target.current = { x: c.x, y: c.y, s: c.s };
+    };
+
+    const onDrop = () => {
+      if (!drag.current.on) return;
+      drag.current.on = false;
+      setHeld(false);
+      const pw = palWRef.current;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const cx = cur.current.x + pw / 2;
+      const cy = h / 2 + cur.current.y;
+      // dropped against an edge: he takes the hint and leaves
+      if (
+        cx < PULL_OFF ||
+        cx > w - PULL_OFF ||
+        cy < PULL_OFF ||
+        cy > h - PULL_OFF
+      ) {
+        sendAway();
+        return;
+      }
+      // otherwise he stays where he was put, and says so
+      aimAt(`parked-${Math.round(cx)}-${Math.round(cy)}`, () =>
+        fromBag(PARKED_LINES),
+      );
+      aimBubble(cx, cur.current.s);
+      restartIdleClock();
+    };
+
+    // --- the loop -----------------------------------------------------
     const loop = () => {
       const c = cur.current;
-      const dx = target.current.x - c.x;
-      // gentle ease with a speed cap so crossing the screen reads as a
-      // stroll, never a teleport
-      let step = dx * 0.11;
-      const MAX = 11;
-      if (step > MAX) step = MAX;
-      if (step < -MAX) step = -MAX;
-      if (Math.abs(dx) > 0.4) c.x += step;
-      // same treatment vertically, so a diagonal walk stays a walk
-      let stepY = (target.current.y - c.y) * 0.1;
-      const MAXY = 9;
-      if (stepY > MAXY) stepY = MAXY;
-      if (stepY < -MAXY) stepY = -MAXY;
-      c.y += stepY;
+      let step = 0;
+      let stepY = 0;
+      let ds = 0;
 
-      // lean into the stride, straighten out when idle
-      const leanTarget = Math.max(-9, Math.min(9, step * 1.6));
+      if (!drag.current.on) {
+        const dx = target.current.x - c.x;
+        // gentle ease with a speed cap so crossing the screen reads as a
+        // stroll, never a teleport. distance shortens his stride on screen
+        step = dx * 0.11;
+        const MAX = 11 * c.s;
+        if (step > MAX) step = MAX;
+        if (step < -MAX) step = -MAX;
+        if (Math.abs(dx) > 0.4) c.x += step;
+        // same treatment vertically, so a diagonal stays a walk
+        stepY = (target.current.y - c.y) * 0.1;
+        const MAXY = 9 * c.s;
+        if (stepY > MAXY) stepY = MAXY;
+        if (stepY < -MAXY) stepY = -MAXY;
+        c.y += stepY;
+        // ...and he grows or shrinks as he comes forward or goes back
+        ds = (target.current.s - c.s) * 0.08;
+        c.s += ds;
+      }
+
+      // lean into the stride, straighten out when idle or carried
+      const leanTarget = drag.current.on
+        ? 0
+        : Math.max(-9, Math.min(9, (step / (c.s || 1)) * 1.6));
       c.lean += (leanTarget - c.lean) * 0.12;
       if (Math.abs(step) > 0.6) c.facing = step > 0 ? 1 : -1;
 
-      const isWalking = Math.abs(step) > 0.45 || Math.abs(stepY) > 0.7;
+      const isWalking =
+        !drag.current.on &&
+        (Math.abs(step) > 0.45 || Math.abs(stepY) > 0.7 || Math.abs(ds) > 0.0015);
       if (isWalking !== wasWalking) {
         wasWalking = isWalking;
         setWalking(isWalking);
@@ -317,7 +455,12 @@ export default function ScrollPal() {
       }
       // speak whenever he's standing somewhere he hasn't announced yet —
       // this also covers two same-side stops, where there's no walk at all
-      if (!isWalking && shownSpot !== spot.current.key) {
+      if (
+        !isWalking &&
+        !drag.current.on &&
+        mode.current !== "leaving" &&
+        shownSpot !== spot.current.key
+      ) {
         shownSpot = spot.current.key;
         clearTimeout(typeTimer);
         setLine(spot.current.line);
@@ -327,20 +470,22 @@ export default function ScrollPal() {
         setArrivalId((n) => n + 1);
         typeTimer = setTimeout(() => setTyping(false), 850);
         // arrived on a wander: hang around a beat, then move along
-        if (afk.current) {
+        if (mode.current === "afk") {
           nextRoamAt = performance.now() + 2800 + Math.random() * 3000;
         }
       }
 
       if (wrapRef.current) {
-        wrapRef.current.style.transform = `translate(${c.x}px, calc(-50% + ${c.y}px))`;
+        wrapRef.current.style.transform =
+          `translate(${c.x}px, calc(-50% + ${c.y}px)) scale(${c.s.toFixed(3)})`;
       }
       if (palRef.current) {
         // rotate first (screen space) so the lean isn't mirrored by the flip
         palRef.current.style.transform = `rotate(${c.lean}deg) scaleX(${c.facing})`;
       }
 
-      if (afk.current && !isWalking && performance.now() >= nextRoamAt) roam();
+      if (mode.current === "afk" && !isWalking && performance.now() >= nextRoamAt)
+        roam();
       raf = requestAnimationFrame(loop);
     };
 
@@ -348,42 +493,72 @@ export default function ScrollPal() {
     cur.current.x = target.current.x;
     cur.current.y = target.current.y;
     raf = requestAnimationFrame(loop);
-    idleTimer = setTimeout(goAfk, IDLE_MS);
+    restartIdleClock();
+    api.current = { grab: onGrab, sendAway };
 
-    const acts = [
-      "pointermove",
-      "pointerdown",
-      "keydown",
-      "wheel",
-      "touchstart",
-    ] as const;
-    for (const a of acts)
-      window.addEventListener(a, wake, { passive: true } as AddEventListenerOptions);
+    // real movement only: a resting hand on a trackpad twitches by a pixel
+    // or two, and that shouldn't count as someone being at the keyboard
+    let ptr: { x: number; y: number } | null = null;
+    const onPointerMove = (e: PointerEvent) => {
+      if (drag.current.on) return;
+      const far = !ptr || Math.hypot(e.clientX - ptr.x, e.clientY - ptr.y) > 6;
+      ptr = { x: e.clientX, y: e.clientY };
+      if (far) wake();
+    };
     const onScroll = () => {
       wake();
+      if (mode.current === "parked") mode.current = "guide"; // back on the job
       computeTarget();
     };
+    // don't clock off while the tab is in the background: the wander would
+    // play to an empty room and be over before anyone looked
+    const onVisibility = () => {
+      if (document.hidden) clearTimeout(idleTimer);
+      else wake();
+    };
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerdown", wake, { passive: true });
+    window.addEventListener("keydown", wake, { passive: true });
+    window.addEventListener("wheel", wake, { passive: true });
+    window.addEventListener("touchstart", wake, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", computeTarget);
+    window.addEventListener("pointermove", onDragMove);
+    window.addEventListener("pointerup", onDrop);
+    window.addEventListener("pointercancel", onDrop);
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(typeTimer);
       clearTimeout(idleTimer);
-      for (const a of acts) window.removeEventListener(a, wake);
+      clearTimeout(goneTimer);
+      api.current = null;
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerdown", wake);
+      window.removeEventListener("keydown", wake);
+      window.removeEventListener("wheel", wake);
+      window.removeEventListener("touchstart", wake);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", computeTarget);
+      window.removeEventListener("pointermove", onDragMove);
+      window.removeEventListener("pointerup", onDrop);
+      window.removeEventListener("pointercancel", onDrop);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
+
+  if (gone) return null;
 
   return (
     <div
       ref={wrapRef}
       className="pointer-events-none fixed left-0 top-1/2 z-40 hidden min-[1600px]:block"
-      style={{ transform: "translate(40px, -50%)" }}
+      style={{ transform: "translate(40px, -50%)", transformOrigin: "50% 100%" }}
       aria-hidden
     >
-      <div className="relative">
+      <div className="group/pal relative">
         {/* above his head, growing toward the screen edge — it stays in the
             gutter, so it can never cover text. types on arrival (key
             remount), then holds the line until he walks off */}
@@ -444,9 +619,30 @@ export default function ScrollPal() {
         </div>
         <div ref={palRef}>
           <div className={walking ? "pal-walk" : "pal-idle"}>
-            <PalSvg width={palW} walking={walking} />
+            {/* he's the only interactive part: grab him and put him wherever
+                suits you, or drop him on an edge to send him away */}
+            <div
+              className={`pointer-events-auto touch-none select-none ${
+                held ? "cursor-grabbing" : "cursor-grab"
+              }`}
+              onPointerDown={(e) => api.current?.grab(e)}
+              title="drag me out of the way"
+            >
+              <PalSvg width={palW} walking={walking} />
+            </div>
           </div>
         </div>
+        {/* ...or dismiss him outright */}
+        <button
+          type="button"
+          tabIndex={-1}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => api.current?.sendAway()}
+          title="send clip pal away"
+          className="pointer-events-auto absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full border border-line bg-surface text-xs leading-none text-muted opacity-0 transition-opacity duration-200 group-hover/pal:opacity-100 hover:text-cream"
+        >
+          ×
+        </button>
       </div>
     </div>
   );
