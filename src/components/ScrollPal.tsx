@@ -27,6 +27,17 @@ const STOPS = [
       "hey — i'm clip pal. i hold this whole thing together.",
       "it looks like you're trying to leave big tech. want a hand?",
       "one clip, zero data harvested. good start, right?",
+      "i've been holding this page together since the top.",
+      "welcome. mind the wire, it's load-bearing.",
+      "mascot and structural support. busy job, honestly.",
+      "first time here? there's not much to sign up for.",
+      "scroll on. i'll keep up. probably.",
+      "made of one bent wire and a lot of opinions.",
+      "no cookie banner. i checked. twice.",
+      "i'd offer you a tour, but you're already on it.",
+      "bit of an odd mascot, i'll admit. grew on people.",
+      "you can read the whole page. it's short, i promise.",
+      "the name's clip pal. the pun was not my idea.",
     ],
   },
   {
@@ -37,6 +48,17 @@ const STOPS = [
       "no ads, no tracking, no catch. all of it, yours.",
       "encrypted on your phone, unreadable everywhere else.",
       "no phone number, no real name, no problem.",
+      "your keys stay in your pocket. that's the whole trick.",
+      "small circles beat a firehose. every time.",
+      "nobody's optimising you for engagement here.",
+      "boring privacy defaults. the good kind of boring.",
+      "yeah, it's free. no, there's no catch tier.",
+      "we can't read your messages. that's not modesty.",
+      "nothing here learns your habits. it just delivers.",
+      "self-host it if you'd rather not trust anyone. fair.",
+      "an app that doesn't want your attention. imagine.",
+      "no engagement metrics. nobody's chasing your time.",
+      "the good stuff is on by default. no settings dive.",
     ],
   },
   {
@@ -47,6 +69,17 @@ const STOPS = [
       "remember when software was on your side? same.",
       "your feed used to be yours. let's do that again.",
       "90s helpfulness, 2026 cryptography. weird mix, i know.",
+      "i miss when apps just did the thing you asked.",
+      "somewhere along the way, the feed stopped being yours.",
+      "we're not reinventing anything. just handing it back.",
+      "old-fashioned? maybe. it worked, though.",
+      "you're the user here, not the product. novel, i know.",
+      "nobody set out to make the internet worse. and yet.",
+      "the web used to feel like a place. it can again.",
+      "turns out you can just... not sell people's data.",
+      "everything got louder. this is the quiet corner.",
+      "small software, made on purpose. that's the pitch.",
+      "if this feels slower, that's deliberate. enjoy it.",
     ],
   },
   {
@@ -57,6 +90,17 @@ const STOPS = [
       "every line is public. read it, fork it, trust it.",
       "don't trust us — trust the code. it's all right there.",
       "built in the open, by people who actually use it.",
+      "go read it. i'll wait, i've got nowhere to be.",
+      "if we were lying, the source would tell on us.",
+      "fork it and make it weird. genuinely, go ahead.",
+      "no secret sauce. just sauce, in a public repo.",
+      "audited by whoever feels like it. that's the point.",
+      "found a bug? tell us. or fix it. either's great.",
+      "the crypto is the boring, well-reviewed kind.",
+      "you don't have to like us. just check our work.",
+      "issues are open. opinions welcome, patches better.",
+      "clone it, run it, keep it. it's yours now too.",
+      "open source isn't a feature. it's the arrangement.",
     ],
   },
   {
@@ -68,9 +112,51 @@ const STOPS = [
       "that's the tour. built with a paperclip and stubbornness.",
       "news travels fast when there are no algorithms.",
       "stick around. or self-host. or both. i'm easy.",
+      "you made it to the bottom. thorough of you.",
+      "that's everything. no newsletter popup, promise.",
+      "android first, then the rest. one thing at a time.",
+      "okay, that's my whole routine. thanks for scrolling.",
+      "we ship when it's ready. novel approach, apparently.",
+      "no launch hype. just a build, when there's a build.",
+      "still here? you're my favourite kind of visitor.",
+      "that's the footer down there. mind the step.",
+      "go on then. the github link's right below me.",
+      "same time next scroll? i'll be around.",
     ],
   },
 ];
+
+// When the page sits still (no mouse, scroll, key or touch) he stops waiting
+// on the scroll anchors, wanders off to the other side of the screen and says
+// an idle line. The moment the visitor does anything again, he heads back to
+// wherever the scroll position says he belongs.
+const IDLE_STOP = {
+  id: "idle",
+  lines: [
+    "you still there? wandered off to stretch my wire.",
+    "quiet in here. i'll keep your seat warm.",
+    "no rush — wiggle the mouse when you're back.",
+    "just me and the paperclips. peaceful, honestly.",
+    "i'll be here. not like i've got other pages to be on.",
+    "taking five. scroll whenever you're ready.",
+    "went to look out the window. nothing out there.",
+    "no notifications to check. strange feeling, isn't it?",
+    "still holding everything together, in case you wondered.",
+    "i counted the pixels. there are a lot of them.",
+    "coffee? i'd offer, but i'm made of wire.",
+    "nothing's loading. it's just quiet. that's allowed.",
+    "i'm not tracking how long you've been gone. promise.",
+    "found a nice patch of whitespace over here.",
+    "if you left the tab open on purpose, respect.",
+    "somewhere a server is idling with me. solidarity.",
+    "take your time. the page isn't going anywhere.",
+    "i straightened myself out a bit. bent back now.",
+  ],
+};
+const IDLE_ENTER_MS = 12000; // stillness before he wanders off
+// between idle wanders while still away — long enough that he settles and
+// reads as resting, instead of pacing across the screen every few seconds
+const IDLE_WANDER_MS = 20000;
 
 const GAP = 12; // clearance between the pal and the content column
 const EDGE = 8; // clearance from the screen edge
@@ -92,8 +178,9 @@ export default function ScrollPal() {
   const target = useRef({ x: 40, y: 0 });
   const cur = useRef({ x: 40, y: 0, lean: 0, facing: 1 as 1 | -1 });
   const palWRef = useRef(88);
-  const nearRef = useRef(STOPS[0]);
-  // first arrival at each stop shows lines[0]; each later visit advances
+  const nearRef = useRef<{ id: string; lines: string[] }>(STOPS[0]);
+  const idle = useRef(false);
+  // the line last played at each stop, so a random pick can avoid repeating it
   const lineIdx = useRef<Record<string, number>>({});
 
   // measure the bubble's content so the box itself can smoothly grow from
@@ -107,10 +194,16 @@ export default function ScrollPal() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    // the content box is 72rem wide and the root font size scales up on big
-    // screens, so measure the rem instead of hardcoding pixels
-    const contentW = () =>
-      72 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    // The content column's width lives in --content-w (globals.css) and both
+    // it and the root font size change across breakpoints, so read them each
+    // time rather than hardcoding pixels. The variable is authored in rem;
+    // fall back to the base 72rem if it ever goes missing.
+    const contentW = () => {
+      const root = getComputedStyle(document.documentElement);
+      const rem = parseFloat(root.fontSize);
+      const declared = parseFloat(root.getPropertyValue("--content-w"));
+      return (Number.isFinite(declared) ? declared : 72) * rem;
+    };
     const gutter = () => Math.max(0, (window.innerWidth - contentW()) / 2);
 
     const sizePal = () => {
@@ -196,6 +289,50 @@ export default function ScrollPal() {
       setBubbleW(Math.round(Math.max(150, Math.min(260, space))));
     };
 
+    let idleTimer: ReturnType<typeof setTimeout> | undefined;
+
+    // pick a resting spot on the far side of the screen from where he stands,
+    // at a random height, and grow the bubble toward the near screen edge
+    const wanderSpot = () => {
+      sizePal();
+      const pw = palWRef.current;
+      const onLeft = cur.current.x < window.innerWidth / 2;
+      const x = onLeft ? parkRight() : parkLeft();
+      const yLimit = window.innerHeight / 2 - 180;
+      target.current = {
+        x,
+        y: Math.round((Math.random() * 2 - 1) * Math.max(0, yLimit)),
+      };
+      const left = !onLeft; // ends up in the left gutter?
+      setLeftGutter(left);
+      const space = left ? x + pw - EDGE : window.innerWidth - x - pw - EDGE;
+      setBubbleW(Math.round(Math.max(150, Math.min(260, space))));
+      nearRef.current = IDLE_STOP;
+    };
+
+    const idleTick = () => {
+      if (!idle.current) return;
+      wanderSpot();
+      idleTimer = setTimeout(idleTick, IDLE_WANDER_MS);
+    };
+    const enterIdle = () => {
+      if (idle.current) return;
+      idle.current = true;
+      wanderSpot();
+      idleTimer = setTimeout(idleTick, IDLE_WANDER_MS);
+    };
+    const exitIdle = () => {
+      if (!idle.current) return;
+      idle.current = false;
+      computeTarget(); // straight back to his scroll anchor
+    };
+    // any interaction wakes him and restarts the stillness countdown
+    const activity = () => {
+      clearTimeout(idleTimer);
+      exitIdle();
+      idleTimer = setTimeout(enterIdle, IDLE_ENTER_MS);
+    };
+
     let raf = 0;
     let wasWalking = false;
     let shownStop: string | null = null; // stop whose line the bubble shows
@@ -205,20 +342,23 @@ export default function ScrollPal() {
     const loop = () => {
       // re-measure a few times a second: reveal animations and layout
       // shifts move the anchors without firing a scroll event
-      if (++frame % 20 === 0) computeTarget();
+      if (++frame % 20 === 0 && !idle.current) computeTarget();
       const c = cur.current;
       const dx = target.current.x - c.x;
-      // gentle ease with a speed cap so crossing the screen reads as a
-      // stroll, never a teleport
-      let step = dx * 0.11;
-      const MAX = 11;
+      // gentle ease with a speed cap so crossing the screen reads as a brisk
+      // walk — 11 was a sprint, 5.5 was a crawl
+      let step = dx * 0.1;
+      const MAX = 8;
       if (step > MAX) step = MAX;
       if (step < -MAX) step = -MAX;
       if (Math.abs(dx) > 0.4) c.x += step;
       // capped vertical follow: he lags a touch behind fast scrolls and
       // catches up, like he's actually running after his anchor
       let stepY = (target.current.y - c.y) * 0.1;
-      const MAXY = 14;
+      // barely above the horizontal cap: enough to still claw back ground
+      // during a fast scroll, but close enough that his vertical and
+      // horizontal movement read as the same creature at the same pace
+      const MAXY = 9;
       if (stepY > MAXY) stepY = MAXY;
       if (stepY < -MAXY) stepY = -MAXY;
       c.y += stepY;
@@ -245,9 +385,13 @@ export default function ScrollPal() {
         const s = nearRef.current;
         shownStop = s.id;
         clearTimeout(typeTimer);
-        const i = lineIdx.current[s.id] ?? 0;
-        setLine(s.lines[i % s.lines.length]);
-        lineIdx.current[s.id] = i + 1;
+        // random line, but never the same one twice running — with this many
+        // per stop an immediate repeat is the only ordering that reads as a bug
+        const last = lineIdx.current[s.id];
+        let i = Math.floor(Math.random() * s.lines.length);
+        if (s.lines.length > 1 && i === last) i = (i + 1) % s.lines.length;
+        lineIdx.current[s.id] = i;
+        setLine(s.lines[i]);
         setBubbleOn(true);
         setTyping(true);
         setBubSize(null); // fresh bubble starts at the dots' natural size
@@ -269,14 +413,31 @@ export default function ScrollPal() {
     cur.current.x = target.current.x;
     cur.current.y = target.current.y;
     raf = requestAnimationFrame(loop);
-    window.addEventListener("scroll", computeTarget, { passive: true });
+
+    const onScroll = () => {
+      activity();
+      computeTarget();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", computeTarget);
+    window.addEventListener("mousemove", activity, { passive: true });
+    window.addEventListener("keydown", activity);
+    window.addEventListener("pointerdown", activity, { passive: true });
+    window.addEventListener("touchstart", activity, { passive: true });
+    window.addEventListener("wheel", activity, { passive: true });
+    idleTimer = setTimeout(enterIdle, IDLE_ENTER_MS); // start the countdown
 
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(typeTimer);
-      window.removeEventListener("scroll", computeTarget);
+      clearTimeout(idleTimer);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", computeTarget);
+      window.removeEventListener("mousemove", activity);
+      window.removeEventListener("keydown", activity);
+      window.removeEventListener("pointerdown", activity);
+      window.removeEventListener("touchstart", activity);
+      window.removeEventListener("wheel", activity);
     };
   }, []);
 

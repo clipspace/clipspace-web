@@ -1,6 +1,10 @@
 import { Logo } from "@/components/Logo";
 import ChatDemo from "@/components/ChatDemo";
 import PalSvg from "@/components/PalSvg";
+// Every one of the pal's stops is anchored to an element on this page, so he
+// lives here rather than in the root layout — other routes have nothing for
+// him to point at.
+import ScrollPal from "@/components/ScrollPal";
 
 /* ---------- small building blocks ---------- */
 
@@ -75,13 +79,68 @@ function Feature({
   );
 }
 
+/* A Gem-type paperclip — the everyday kind — drawn as one continuous wire.
+   The proportions are what sell it: the outer arm runs down the side into a
+   wide bottom U, back up, then a *tighter* top loop that folds inward and
+   ends in a short free arm down the middle. Equal loops read as a bracket
+   instead of a clip. */
+function Paperclip({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 92"
+      aria-hidden="true"
+      className={`pointer-events-none absolute drop-shadow-[0_2px_3px_rgba(0,0,0,0.55)] ${className}`}
+      fill="none"
+    >
+      <path
+        d="M4 24 V70 A12 12 0 0 0 28 70 V18 A6 6 0 0 0 16 18 V58"
+        stroke="#D9A441"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function Clipping({
+  href,
+  source,
+  title,
+  tilt,
+}: {
+  href: string;
+  source: string;
+  title: React.ReactNode;
+  tilt: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      /* the deep top padding is what keeps the text clear of both clips */
+      className={`relative block rounded-lg border border-line bg-surface-2 px-5 pb-4 pt-8 shadow-lg transition-all hover:rotate-0 hover:border-brass/40 ${tilt}`}
+    >
+      {/* one clip per top corner, mirrored so they read as a matched pair.
+          Roughly half the clip sits above the edge and half grips the card —
+          hang them higher and they stop looking attached to anything. */}
+      <Paperclip className="-top-6 left-3 h-12 -scale-x-100" />
+      <Paperclip className="-top-6 right-3 h-12" />
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
+        {source}
+      </p>
+      <p className="font-display mt-1.5 font-bold leading-snug">{title}</p>
+    </a>
+  );
+}
+
 /* ---------- page ---------- */
 
 export default function Home() {
   return (
     <main className="flex-1">
       {/* nav */}
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+      <header className="mx-auto flex content-col items-center justify-between px-6 py-5">
         <Logo size={34} textClass="text-xl" />
         <nav className="hidden items-center gap-8 text-sm text-muted sm:flex">
           <a href="#features" className="transition-colors hover:text-cream">Features</a>
@@ -98,7 +157,7 @@ export default function Home() {
 
       {/* hero */}
       <section id="hero">
-        <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-24 pt-14 md:grid-cols-2 md:pt-20">
+        <div className="mx-auto grid content-col items-center gap-14 px-6 pb-24 pt-14 md:grid-cols-2 md:pt-20">
           <div data-reveal className="min-w-0">
             <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brass">
               work in progress, coming soon
@@ -159,7 +218,7 @@ export default function Home() {
       </section>
 
       {/* features */}
-      <section id="features" className="mx-auto max-w-6xl px-6 py-20">
+      <section id="features" className="mx-auto content-col px-6 py-20">
         <h2 className="font-display text-center text-3xl font-bold md:text-4xl" data-reveal>
           <span id="pal-features-anchor">
             Everything a social network should be.
@@ -197,7 +256,7 @@ export default function Home() {
 
       {/* why */}
       <section id="why" className="border-y border-line bg-surface">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-[auto_1fr] min-[1600px]:grid-cols-2 min-[1600px]:gap-16">
+        <div className="mx-auto grid content-col items-center gap-10 px-6 py-20 md:grid-cols-[auto_1fr] min-[1600px]:grid-cols-2 min-[1600px]:gap-16">
           {/* the clip pal keeps you company here up to 1600px; on wide
               desktops the walking guide passes through instead */}
           <div className="mx-auto md:mx-0 min-[1600px]:hidden" data-reveal>
@@ -231,55 +290,33 @@ export default function Home() {
             <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               don&apos;t just take our word for it
             </p>
-            <div className="mt-6 space-y-4">
-              <a
+            {/* extra top gap so the first clip has air to hang in */}
+            <div className="mt-8 space-y-6">
+              <Clipping
                 href="https://jacobin.com/2025/10/internet-enshittification-antitrust-tech-doctorow"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block -rotate-1 rounded-lg border border-line bg-surface-2 px-5 py-4 shadow-lg transition-all hover:rotate-0 hover:border-brass/40"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
-                  Jacobin
-                </p>
-                <p className="font-display mt-1.5 font-bold leading-snug">
-                  How to save the internet from &ldquo;enshittification&rdquo;
-                </p>
-              </a>
-              <a
+                source="Jacobin"
+                tilt="-rotate-1"
+                title={<>How to save the internet from &ldquo;enshittification&rdquo;</>}
+              />
+              <Clipping
                 href="https://www.vice.com/en/article/targeted-advertising-is-ruining-the-internet-and-breaking-the-world/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rotate-[1.2deg] rounded-lg border border-line bg-surface-2 px-5 py-4 shadow-lg transition-all hover:rotate-0 hover:border-brass/40"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
-                  VICE
-                </p>
-                <p className="font-display mt-1.5 font-bold leading-snug">
-                  Targeted advertising is ruining the internet and breaking
-                  the world
-                </p>
-              </a>
-              <a
+                source="VICE"
+                tilt="rotate-[1.2deg]"
+                title="Targeted advertising is ruining the internet and breaking the world"
+              />
+              <Clipping
                 href="https://privacyinternational.org/long-read/2967/ad-supported-internet-broken-inefficient-and-privacy-nightmare-lets-fix-it"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block -rotate-[0.6deg] rounded-lg border border-line bg-surface-2 px-5 py-4 shadow-lg transition-all hover:rotate-0 hover:border-brass/40"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
-                  Privacy International
-                </p>
-                <p className="font-display mt-1.5 font-bold leading-snug">
-                  The ad-supported internet is broken, inefficient and a
-                  privacy nightmare
-                </p>
-              </a>
+                source="Privacy International"
+                tilt="-rotate-[0.6deg]"
+                title="The ad-supported internet is broken, inefficient and a privacy nightmare"
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* open source */}
-      <section id="opensource" className="mx-auto max-w-6xl px-6 py-20">
+      <section id="opensource" className="mx-auto content-col px-6 py-20">
         <div className="grid items-center gap-12 md:grid-cols-2">
           <div data-reveal>
             <h2 className="font-display text-3xl font-bold md:text-4xl">
@@ -321,7 +358,7 @@ export default function Home() {
 
       {/* what's new */}
       <section id="news" className="border-t border-line bg-surface">
-        <div className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mx-auto content-col px-6 py-20">
           <h2 className="font-display text-3xl font-bold md:text-4xl" data-reveal>
             <span id="pal-news-anchor">What&apos;s new?</span>
           </h2>
@@ -358,7 +395,7 @@ export default function Home() {
 
       {/* footer */}
       <footer id="contact" className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 py-10 text-center">
+        <div className="mx-auto flex content-col flex-col items-center gap-4 px-6 py-10 text-center">
           <Logo size={28} textClass="text-lg" />
           <p className="max-w-md text-sm text-muted">
             Free. Open source. Encrypted. Yours.
@@ -375,6 +412,8 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      <ScrollPal />
     </main>
   );
 }
