@@ -13,18 +13,21 @@
 // class removal without duplicating the numbers.
 export const PAL_EMOTES = {
   unbend: 4600, // unwinds into a straight wire, holds the stretch, curls back
+  curl: 3400, // rolls himself up into a tight spiral and unrolls
   heart: 3000, // bends into a heart
   question: 2600, // bends into a question mark, dot and all
   spin: 1100, // pirouette
   look: 1900, // glances left and right
   lean: 2400, // steps up closer to say something
   hop: 1600, // bounces on the spot
-  knock: 1900, // taps on the inside of the screen
+  knock: 3600, // walks up, winds his leg, taps the glass, backs off
+  wave: 2200, // waves with his leg
+  nod: 1500, // yes
+  shake: 1500, // no
+  dance: 2600, // sways with the leg kicking out
 } as const;
 
 export type PalEmote = keyof typeof PAL_EMOTES;
-
-export const PAL_EMOTE_NAMES = Object.keys(PAL_EMOTES) as PalEmote[];
 
 export default function PalSvg({
   width = 88,

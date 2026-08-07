@@ -207,6 +207,24 @@ html { font-size: 14.4px; }
   66% { transform: scaleY(1.06); }
 }
 
+/* rolls himself up into a tight spiral and unrolls again */
+@keyframes pal-curl {
+  0%, 100% {
+    d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20");
+  }
+  32%, 70% {
+    d: path("M27 68 L13 63 C1 54 3 33 21 29 C36 26 44 41 35 52 L32 54 C25 59 15 53 17 44 C19 37 26 36 29 40 L28 45");
+  }
+}
+@keyframes pal-curl-leg {
+  0%, 100% {
+    d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54");
+  }
+  32%, 70% {
+    d: path("M28 45 C28 45 28 45 28 45 C28 45 28 45 28 45 L28 45");
+  }
+}
+
 /* bends into a heart */
 @keyframes pal-heart {
   0%, 100% {
@@ -294,17 +312,86 @@ html { font-size: 14.4px; }
   84% { transform: translateY(0) scale(1.03, 0.97); }
 }
 
-/* knocks on the inside of the screen — the scale-up is him pressing toward
-   you on each tap */
+/* Knocks on the inside of the screen, in four beats: he dips (anticipation),
+   walks up to the glass, winds his leg all the way round, raps three times,
+   then backs off. Growing is how he gets "closer" — there is no depth here,
+   so scale has to carry it. */
 @keyframes pal-knock {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  14% { transform: rotate(-9deg) scale(1); }
-  26% { transform: rotate(3deg) scale(1.11); }
-  38% { transform: rotate(-7deg) scale(1.01); }
-  50% { transform: rotate(3deg) scale(1.11); }
-  62% { transform: rotate(-6deg) scale(1.01); }
-  74% { transform: rotate(2deg) scale(1.08); }
-  88% { transform: rotate(-2deg) scale(1); }
+  0% { transform: scale(1) rotate(0deg) translateY(0); }
+  6% { transform: scale(0.95) rotate(0deg) translateY(2px); }
+  19% { transform: scale(1.16) rotate(0deg) translateY(-2px); }
+  25% { transform: scale(1.12) rotate(0deg) translateY(0); }
+  35% { transform: scale(1.12) rotate(-4deg) translateY(0); }
+  46% { transform: scale(1.12) rotate(2deg) translateY(0); }
+  52% { transform: scale(1.18) rotate(4deg) translateY(0); }
+  58% { transform: scale(1.1) rotate(-3deg) translateY(0); }
+  64% { transform: scale(1.18) rotate(4deg) translateY(0); }
+  70% { transform: scale(1.1) rotate(-3deg) translateY(0); }
+  76% { transform: scale(1.16) rotate(3deg) translateY(0); }
+  89% { transform: scale(1.04) rotate(-1deg) translateY(0); }
+  100% { transform: scale(1) rotate(0deg) translateY(0); }
+}
+/* The leg pivots at the hip, so it can wind right round like an arm. It lands
+   on -360deg rather than 0 so the wind-up unwinds instead of snapping back. */
+@keyframes pal-knock-leg {
+  0%, 22% { transform: rotate(0deg); }
+  30% { transform: rotate(38deg); }
+  46% { transform: rotate(-360deg); }
+  52% { transform: rotate(-338deg); }
+  58% { transform: rotate(-374deg); }
+  64% { transform: rotate(-338deg); }
+  70% { transform: rotate(-374deg); }
+  76% { transform: rotate(-344deg); }
+  88%, 100% { transform: rotate(-360deg); }
+}
+
+/* waves with the leg, the way you'd wave an arm */
+@keyframes pal-wave-leg {
+  0%, 100% { transform: rotate(0deg); }
+  16% { transform: rotate(-54deg); }
+  34% { transform: rotate(-20deg); }
+  52% { transform: rotate(-56deg); }
+  70% { transform: rotate(-20deg); }
+  86% { transform: rotate(-44deg); }
+}
+@keyframes pal-wave-body {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 80% { transform: rotate(4deg); }
+}
+
+/* yes: he bobs toward you and back, twice */
+@keyframes pal-nod {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  22% { transform: translateY(4px) scaleY(0.93); }
+  44% { transform: translateY(0) scaleY(1); }
+  66% { transform: translateY(4px) scaleY(0.93); }
+  84% { transform: translateY(0) scaleY(1); }
+}
+
+/* no */
+@keyframes pal-shake {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-8deg); }
+  32% { transform: rotate(8deg); }
+  49% { transform: rotate(-7deg); }
+  66% { transform: rotate(6deg); }
+  83% { transform: rotate(-3deg); }
+}
+
+/* sways from side to side with the leg kicking out on the beat */
+@keyframes pal-dance {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  20% { transform: rotate(-8deg) translateX(-3px); }
+  40% { transform: rotate(7deg) translateX(3px); }
+  60% { transform: rotate(-7deg) translateX(-3px); }
+  80% { transform: rotate(6deg) translateX(2px); }
+}
+@keyframes pal-dance-leg {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(30deg); }
+  40% { transform: rotate(-26deg); }
+  60% { transform: rotate(28deg); }
+  80% { transform: rotate(-22deg); }
 }
 
 /* The emotes that move his whole body pivot at his foot, so he pushes off the
@@ -312,7 +399,11 @@ html { font-size: 14.4px; }
 .pal-em-lean,
 .pal-em-hop,
 .pal-em-knock,
-.pal-em-unbend {
+.pal-em-unbend,
+.pal-em-wave,
+.pal-em-nod,
+.pal-em-shake,
+.pal-em-dance {
   transform-origin: 50% 100%;
 }
 
@@ -333,9 +424,24 @@ html { font-size: 14.4px; }
 .pal-em-look { animation: pal-look-tilt 1.9s ease-in-out both; }
 .pal-em-look .pal-eye { animation: pal-look-eyes 1.9s ease-in-out both; }
 
+.pal-em-curl .pal-body { animation: pal-curl 3.4s ease-in-out both; }
+.pal-em-curl .pal-leg { animation: pal-curl-leg 3.4s ease-in-out both; }
+.pal-em-curl .pal-eye { animation: pal-face-away 3.4s ease-in-out both; }
+
 .pal-em-lean { animation: pal-lean 2.4s ease-in-out both; }
 .pal-em-hop { animation: pal-bounce 1.6s ease-out both; }
-.pal-em-knock { animation: pal-knock 1.9s ease-in-out both; }
+
+.pal-em-knock { animation: pal-knock 3.6s ease-in-out both; }
+.pal-em-knock .pal-leg { animation: pal-knock-leg 3.6s ease-in-out both; }
+
+.pal-em-wave { animation: pal-wave-body 2.2s ease-in-out both; }
+.pal-em-wave .pal-leg { animation: pal-wave-leg 2.2s ease-in-out both; }
+
+.pal-em-nod { animation: pal-nod 1.5s ease-in-out both; }
+.pal-em-shake { animation: pal-shake 1.5s ease-in-out both; }
+
+.pal-em-dance { animation: pal-dance 2.6s ease-in-out both; }
+.pal-em-dance .pal-leg { animation: pal-dance-leg 2.6s ease-in-out both; }
 
 /* speech bubble pops in whenever he says something new */
 @keyframes pal-say {

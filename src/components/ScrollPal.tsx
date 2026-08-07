@@ -7,12 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { LINE_EMOTES } from "@/lib/pal-lines";
-import PalSvg, {
-  PAL_EMOTES,
-  PAL_EMOTE_NAMES,
-  type PalEmote,
-} from "./PalSvg";
+import type { PalLine } from "@/lib/pal-lines";
+import PalSvg, { PAL_EMOTES, type PalEmote } from "./PalSvg";
 
 // Desktop-only scroll guide.
 //
@@ -28,119 +24,127 @@ import PalSvg, {
 //
 // Shown only on screens ≥1600px; below that the static pal in the "why"
 // section takes over. (Placeholder lines — the user will replace them.)
-const STOPS = [
+type Stop = {
+  id: string;
+  anchor: string;
+  place: "beside" | "gutter-left" | "gutter-right";
+  gap?: number;
+  lines: readonly PalLine[];
+};
+
+const STOPS: readonly Stop[] = [
   {
     id: "hero",
     anchor: "pal-hero-anchor",
-    place: "beside" as const, // right of "Your keys.", in the headline's air
+    place: "beside", // right of "Your keys.", in the headline's air
     gap: 96, // clear the longer "Your people." line above him
     lines: [
-      "hey — i'm clip pal. i hold this whole thing together.",
-      "it looks like you're trying to leave big tech. want a hand?",
-      "one clip, zero data harvested. good start, right?",
-      "i've been holding this page together since the top.",
-      "welcome. mind the wire, it's load-bearing.",
-      "mascot and structural support. busy job, honestly.",
-      "first time here? there's not much to sign up for.",
-      "scroll on. i'll keep up. probably.",
-      "made of one bent wire and a lot of opinions.",
-      "no cookie banner. i checked. twice.",
-      "i'd offer you a tour, but you're already on it.",
-      "bit of an odd mascot, i'll admit. grew on people.",
-      "you can read the whole page. it's short, i promise.",
-      "the name's clip pal. the pun was not my idea.",
-      "tap tap. hello? anyone still out there?",
-      "come closer, i want to tell you something.",
+      ["hey — i'm clip pal. i hold this whole thing together.", "wave"],
+      ["it looks like you're trying to leave big tech. want a hand?", "question"],
+      ["one clip, zero data harvested. good start, right?", "nod"],
+      ["i've been holding this page together since the top.", "lean"],
+      ["welcome. mind the wire, it's load-bearing.", "wave"],
+      ["mascot and structural support. busy job, honestly.", "unbend"],
+      ["first time here? there's not much to sign up for.", "question"],
+      ["scroll on. i'll keep up. probably.", "hop"],
+      ["made of one bent wire and a lot of opinions.", "unbend"],
+      ["no cookie banner. i checked. twice.", "look"],
+      ["i'd offer you a tour, but you're already on it.", "spin"],
+      ["bit of an odd mascot, i'll admit. grew on people.", "curl"],
+      ["you can read the whole page. it's short, i promise.", "nod"],
+      ["the name's clip pal. the pun was not my idea.", "shake"],
+      ["tap tap. hello? anyone still out there?", "knock"],
+      ["come closer, i want to tell you something.", "lean"],
     ],
   },
   {
     id: "features",
     anchor: "pal-features-anchor",
-    place: "beside" as const,
+    place: "beside",
     lines: [
-      "no ads, no tracking, no catch. all of it, yours.",
-      "encrypted on your phone, unreadable everywhere else.",
-      "no phone number, no real name, no problem.",
-      "your keys stay in your pocket. that's the whole trick.",
-      "small circles beat a firehose. every time.",
-      "nobody's optimising you for engagement here.",
-      "boring privacy defaults. the good kind of boring.",
-      "yeah, it's free. no, there's no catch tier.",
-      "we can't read your messages. that's not modesty.",
-      "nothing here learns your habits. it just delivers.",
-      "self-host it if you'd rather not trust anyone. fair.",
-      "an app that doesn't want your attention. imagine.",
-      "no engagement metrics. nobody's chasing your time.",
-      "the good stuff is on by default. no settings dive.",
-      "psst. this next bit is my favourite.",
-      "look, i can jump. that's the whole trick.",
+      ["no ads, no tracking, no catch. all of it, yours.", "shake"],
+      ["encrypted on your phone, unreadable everywhere else.", "curl"],
+      ["no phone number, no real name, no problem.", "shake"],
+      ["your keys stay in your pocket. that's the whole trick.", "spin"],
+      ["small circles beat a firehose. every time.", "nod"],
+      ["nobody's optimising you for engagement here.", "shake"],
+      ["boring privacy defaults. the good kind of boring.", "nod"],
+      ["yeah, it's free. no, there's no catch tier.", "nod"],
+      ["we can't read your messages. that's not modesty.", "shake"],
+      ["nothing here learns your habits. it just delivers.", "shake"],
+      ["self-host it if you'd rather not trust anyone. fair.", "question"],
+      ["an app that doesn't want your attention. imagine.", "look"],
+      ["no engagement metrics. nobody's chasing your time.", "shake"],
+      ["the good stuff is on by default. no settings dive.", "nod"],
+      ["psst. this next bit is my favourite.", "lean"],
+      ["look, i can jump. that's the whole trick.", "hop"],
     ],
   },
   {
     id: "why",
     anchor: "pal-why-anchor",
-    place: "gutter-left" as const,
+    place: "gutter-left",
     lines: [
-      "remember when software was on your side? same.",
-      "your feed used to be yours. let's do that again.",
-      "90s helpfulness, 2026 cryptography. weird mix, i know.",
-      "i miss when apps just did the thing you asked.",
-      "somewhere along the way, the feed stopped being yours.",
-      "we're not reinventing anything. just handing it back.",
-      "old-fashioned? maybe. it worked, though.",
-      "you're the user here, not the product. novel, i know.",
-      "nobody set out to make the internet worse. and yet.",
-      "the web used to feel like a place. it can again.",
-      "turns out you can just... not sell people's data.",
-      "everything got louder. this is the quiet corner.",
-      "small software, made on purpose. that's the pitch.",
-      "if this feels slower, that's deliberate. enjoy it.",
-      "hang on — i need a proper stretch.",
-      "one leg and still bouncing. respect that.",
+      ["remember when software was on your side? same.", "nod"],
+      ["your feed used to be yours. let's do that again.", "heart"],
+      ["90s helpfulness, 2026 cryptography. weird mix, i know.", "wave"],
+      ["i miss when apps just did the thing you asked.", "look"],
+      ["somewhere along the way, the feed stopped being yours.", "shake"],
+      ["we're not reinventing anything. just handing it back.", "shake"],
+      ["old-fashioned? maybe. it worked, though.", "question"],
+      ["you're the user here, not the product. novel, i know.", "heart"],
+      ["nobody set out to make the internet worse. and yet.", "shake"],
+      ["the web used to feel like a place. it can again.", "lean"],
+      ["turns out you can just... not sell people's data.", "shake"],
+      ["everything got louder. this is the quiet corner.", "curl"],
+      ["small software, made on purpose. that's the pitch.", "nod"],
+      ["if this feels slower, that's deliberate. enjoy it.", "unbend"],
+      ["hang on — i need a proper stretch.", "unbend"],
+      ["one leg and still bouncing. respect that.", "hop"],
     ],
   },
   {
     id: "opensource",
     anchor: "pal-open-anchor",
-    place: "gutter-right" as const,
+    place: "gutter-right",
     lines: [
-      "every line is public. read it, fork it, trust it.",
-      "don't trust us — trust the code. it's all right there.",
-      "built in the open, by people who actually use it.",
-      "go read it. i'll wait, i've got nowhere to be.",
-      "if we were lying, the source would tell on us.",
-      "fork it and make it weird. genuinely, go ahead.",
-      "no secret sauce. just sauce, in a public repo.",
-      "audited by whoever feels like it. that's the point.",
-      "found a bug? tell us. or fix it. either's great.",
-      "the crypto is the boring, well-reviewed kind.",
-      "you don't have to like us. just check our work.",
-      "issues are open. opinions welcome, patches better.",
-      "clone it, run it, keep it. it's yours now too.",
-      "open source isn't a feature. it's the arrangement.",
-      "ta-da. i've been practising that one.",
+      ["every line is public. read it, fork it, trust it.", "lean"],
+      ["don't trust us — trust the code. it's all right there.", "lean"],
+      ["built in the open, by people who actually use it.", "nod"],
+      ["go read it. i'll wait, i've got nowhere to be.", "curl"],
+      ["if we were lying, the source would tell on us.", "shake"],
+      ["fork it and make it weird. genuinely, go ahead.", "dance"],
+      ["no secret sauce. just sauce, in a public repo.", "shake"],
+      ["audited by whoever feels like it. that's the point.", "nod"],
+      ["found a bug? tell us. or fix it. either's great.", "question"],
+      ["the crypto is the boring, well-reviewed kind.", "nod"],
+      ["you don't have to like us. just check our work.", "look"],
+      ["issues are open. opinions welcome, patches better.", "wave"],
+      ["clone it, run it, keep it. it's yours now too.", "heart"],
+      ["open source isn't a feature. it's the arrangement.", "nod"],
+      ["ta-da. i've been practising that one.", "spin"],
     ],
   },
   {
     id: "news",
     anchor: "pal-news-anchor",
-    place: "beside" as const,
+    place: "beside",
     lines: [
-      "fresh off the press: android comes first.",
-      "that's the tour. built with a paperclip and stubbornness.",
-      "news travels fast when there are no algorithms.",
-      "stick around. or self-host. or both. i'm easy.",
-      "you made it to the bottom. thorough of you.",
-      "that's everything. no newsletter popup, promise.",
-      "android first, then the rest. one thing at a time.",
-      "okay, that's my whole routine. thanks for scrolling.",
-      "we ship when it's ready. novel approach, apparently.",
-      "no launch hype. just a build, when there's a build.",
-      "still here? you're my favourite kind of visitor.",
-      "that's the footer down there. mind the step.",
-      "go on then. the github link's right below me.",
-      "same time next scroll? i'll be around.",
-      "ahh. that's the good kind of straight.",
+      ["fresh off the press: android comes first.", "hop"],
+      ["that's the tour. built with a paperclip and stubbornness.", "spin"],
+      ["news travels fast when there are no algorithms.", "nod"],
+      ["stick around. or self-host. or both. i'm easy.", "question"],
+      ["you made it to the bottom. thorough of you.", "nod"],
+      ["that's everything. no newsletter popup, promise.", "shake"],
+      ["android first, then the rest. one thing at a time.", "hop"],
+      ["okay, that's my whole routine. thanks for scrolling.", "dance"],
+      ["we ship when it's ready. novel approach, apparently.", "nod"],
+      ["no launch hype. just a build, when there's a build.", "shake"],
+      ["still here? you're my favourite kind of visitor.", "heart"],
+      ["that's the footer down there. mind the step.", "look"],
+      ["go on then. the github link's right below me.", "lean"],
+      ["same time next scroll? i'll be around.", "wave"],
+      ["ahh. that's the good kind of straight.", "unbend"],
     ],
   },
 ];
@@ -149,28 +153,30 @@ const STOPS = [
 // on the scroll anchors, wanders off to the other side of the screen and says
 // an idle line. The moment the visitor does anything again, he heads back to
 // wherever the scroll position says he belongs.
-const IDLE_STOP = {
+const IDLE_STOP: { id: string; lines: readonly PalLine[] } = {
   id: "idle",
   lines: [
-    "you still there? wandered off to stretch my wire.",
-    "quiet in here. i'll keep your seat warm.",
-    "no rush — wiggle the mouse when you're back.",
-    "just me and the paperclips. peaceful, honestly.",
-    "i'll be here. not like i've got other pages to be on.",
-    "taking five. scroll whenever you're ready.",
-    "went to look out the window. nothing out there.",
-    "no notifications to check. strange feeling, isn't it?",
-    "still holding everything together, in case you wondered.",
-    "i counted the pixels. there are a lot of them.",
-    "coffee? i'd offer, but i'm made of wire.",
-    "nothing's loading. it's just quiet. that's allowed.",
-    "i'm not tracking how long you've been gone. promise.",
-    "found a nice patch of whitespace over here.",
-    "if you left the tab open on purpose, respect.",
-    "somewhere a server is idling with me. solidarity.",
-    "take your time. the page isn't going anywhere.",
-    "i straightened myself out a bit. bent back now.",
-    "knock knock. you awake in there?",
+    ["you still there? wandered off to stretch my wire.", "unbend"],
+    ["quiet in here. i'll keep your seat warm.", "curl"],
+    ["no rush — wiggle the mouse when you're back.", "knock"],
+    ["just me and the paperclips. peaceful, honestly.", "look"],
+    ["i'll be here. not like i've got other pages to be on.", "shake"],
+    ["taking five. scroll whenever you're ready.", "curl"],
+    ["went to look out the window. nothing out there.", "look"],
+    ["no notifications to check. strange feeling, isn't it?", "question"],
+    ["still holding everything together, in case you wondered.", "nod"],
+    ["i counted the pixels. there are a lot of them.", "look"],
+    ["coffee? i'd offer, but i'm made of wire.", "question"],
+    ["nothing's loading. it's just quiet. that's allowed.", "curl"],
+    ["i'm not tracking how long you've been gone. promise.", "shake"],
+    ["found a nice patch of whitespace over here.", "look"],
+    ["if you left the tab open on purpose, respect.", "nod"],
+    ["somewhere a server is idling with me. solidarity.", "heart"],
+    ["take your time. the page isn't going anywhere.", "nod"],
+    ["i straightened myself out a bit. bent back now.", "unbend"],
+    ["knock knock. you awake in there?", "knock"],
+    ["nobody's watching. might as well dance.", "dance"],
+    ["hello? tap the glass if you're still there.", "knock"],
   ],
 };
 const IDLE_ENTER_MS = 12000; // stillness before he wanders off
@@ -197,24 +203,20 @@ const LEAN_EASE = 7.67; // likewise, ≈0.12 per frame at 60Hz
 const WALK_SPEED = 27; // px/s above which he counts as walking (was 0.45/frame)
 const FACE_SPEED = 36; // px/s above which he turns to face his direction
 const RETARGET_MS = 330; // how often to re-measure the anchors
-// How often an arrival comes with an emote. Rare enough at a normal stop that
-// catching one feels like a find; more likely while he's idling and has
-// nothing else to do.
-const EMOTE_ODDS = 0.18;
-const IDLE_EMOTE_ODDS = 0.4;
+// Beat between the bubble appearing and the trick, so the line is on screen
+// first and the emote reads as him acting it out rather than a coincidence.
+const EMOTE_DELAY_MS = 500;
 
 export default function ScrollPal() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const palRef = useRef<HTMLDivElement>(null);
-  const [line, setLine] = useState(STOPS[0].lines[0]);
+  const [line, setLine] = useState(STOPS[0].lines[0][0]);
   const [leftGutter, setLeftGutter] = useState(true);
   const [bubbleOn, setBubbleOn] = useState(true);
   const [typing, setTyping] = useState(true);
   const [arrivalId, setArrivalId] = useState(0);
   const [walking, setWalking] = useState(false);
   const [emote, setEmote] = useState<PalEmote | null>(null);
-  // the emote last played, so a random pick can avoid repeating it
-  const lastEmote = useRef<PalEmote | null>(null);
   const [palW, setPalW] = useState(88);
   const [bubbleW, setBubbleW] = useState(240);
   const [bubSize, setBubSize] = useState<{ w: number; h: number } | null>(null);
@@ -223,7 +225,7 @@ export default function ScrollPal() {
   const target = useRef({ x: 40, y: 0 });
   const cur = useRef({ x: 40, y: 0, lean: 0, facing: 1 as 1 | -1 });
   const palWRef = useRef(88);
-  const nearRef = useRef<{ id: string; lines: string[] }>(STOPS[0]);
+  const nearRef = useRef<{ id: string; lines: readonly PalLine[] }>(STOPS[0]);
   const idle = useRef(false);
   // drag state: while `dragging` he follows the pointer instead of his target,
   // and `dropped` keeps him where he was let go until the next scroll
@@ -396,17 +398,9 @@ export default function ScrollPal() {
     let shownStop: string | null = null; // stop whose line the bubble shows
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
     let emoteTimer: ReturnType<typeof setTimeout> | undefined;
+    let emoteEnd: ReturnType<typeof setTimeout> | undefined;
     let last = performance.now();
     let lastRetarget = 0;
-
-    // random trick, never the same one twice running
-    const pickEmote = (): PalEmote => {
-      let i = Math.floor(Math.random() * PAL_EMOTE_NAMES.length);
-      if (PAL_EMOTE_NAMES[i] === lastEmote.current) {
-        i = (i + 1) % PAL_EMOTE_NAMES.length;
-      }
-      return PAL_EMOTE_NAMES[i];
-    };
 
     const loop = (now: number) => {
       const c = cur.current;
@@ -467,6 +461,7 @@ export default function ScrollPal() {
           // time
           clearTimeout(typeTimer);
           clearTimeout(emoteTimer);
+          clearTimeout(emoteEnd);
           setEmote(null);
           setBubbleOn(false);
           shownStop = null;
@@ -484,24 +479,23 @@ export default function ScrollPal() {
         let i = Math.floor(Math.random() * s.lines.length);
         if (s.lines.length > 1 && i === last) i = (i + 1) % s.lines.length;
         lineIdx.current[s.id] = i;
-        setLine(s.lines[i]);
+        const [text, acts] = s.lines[i];
+        setLine(text);
         setBubbleOn(true);
         setTyping(true);
         setBubSize(null); // fresh bubble starts at the dots' natural size
         setArrivalId((n) => n + 1);
         typeTimer = setTimeout(() => setTyping(false), 850);
 
-        // Standing still is when he can afford to bend himself into shapes.
-        // A line that describes a particular trick always gets that trick;
-        // otherwise it's an occasional random one.
-        const asked = LINE_EMOTES[s.lines[i]];
-        if (asked || Math.random() < (s.id === IDLE_STOP.id ? IDLE_EMOTE_ODDS : EMOTE_ODDS)) {
-          const e = asked ?? pickEmote();
-          lastEmote.current = e;
-          clearTimeout(emoteTimer);
-          setEmote(e);
-          emoteTimer = setTimeout(() => setEmote(null), PAL_EMOTES[e]);
-        }
+        // Every line comes with the trick that belongs to it — he acts out
+        // what he just said, a beat after the bubble lands.
+        clearTimeout(emoteTimer);
+        clearTimeout(emoteEnd);
+        setEmote(null);
+        emoteTimer = setTimeout(() => {
+          setEmote(acts);
+          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTES[acts]);
+        }, EMOTE_DELAY_MS);
       }
 
       if (wrapRef.current) {
@@ -538,7 +532,8 @@ export default function ScrollPal() {
       clearTimeout(typeTimer);
       clearTimeout(idleTimer);
       clearTimeout(emoteTimer);
-  window.removeEventListener("scroll", onScroll);
+      clearTimeout(emoteEnd);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", computeTarget);
       window.removeEventListener("mousemove", activity);
       window.removeEventListener("keydown", activity);

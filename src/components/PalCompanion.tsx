@@ -1,12 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LINE_EMOTES, PAL_LINES } from "@/lib/pal-lines";
-import PalSvg, {
-  PAL_EMOTES,
-  PAL_EMOTE_NAMES,
-  type PalEmote,
-} from "./PalSvg";
+import { PAL_LINES } from "@/lib/pal-lines";
+import PalSvg, { PAL_EMOTES, type PalEmote } from "./PalSvg";
 
 // The standing pal, for phones and narrower desktops where the walking guide
 // never runs. Every so often a bubble appears over his head, he says one line,
@@ -15,15 +11,16 @@ const TYPING_MS = 850; // dots before the line lands
 const SHOW_MS = 10_000; // how long the bubble stays up
 const GAP_MS = 20_000; // silence between bubbles
 const FIRST_MS = 1_500; // beat after he scrolls into view, before the first line
-const EMOTE_ODDS = 0.3; // chance a line comes with one of his tricks
+// Beat between the bubble appearing and the trick, so the line is on screen
+// first and the emote reads as him acting it out.
+const EMOTE_DELAY_MS = 500;
 
 export default function PalCompanion({ width = 90 }: { width?: number }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [line, setLine] = useState<string>(PAL_LINES[0]);
+  const [line, setLine] = useState<string>(PAL_LINES[0][0]);
   const [shown, setShown] = useState(false);
   const [typing, setTyping] = useState(true);
   const [emote, setEmote] = useState<PalEmote | null>(null);
-  const lastEmote = useRef<PalEmote | null>(null);
   // remounts the bubble so its entrance animation replays each time
   const [turn, setTurn] = useState(0);
   const lastLine = useRef(-1);
@@ -43,24 +40,17 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
     let phaseTimer: ReturnType<typeof setTimeout> | undefined;
     let emoteTimer: ReturnType<typeof setTimeout> | undefined;
+    let emoteEnd: ReturnType<typeof setTimeout> | undefined;
     let running = false;
 
     const stop = () => {
       clearTimeout(typeTimer);
       clearTimeout(phaseTimer);
       clearTimeout(emoteTimer);
+      clearTimeout(emoteEnd);
       running = false;
       setShown(false);
       setEmote(null);
-    };
-
-    // random trick, never the same one twice running
-    const pickEmote = (): PalEmote => {
-      let i = Math.floor(Math.random() * PAL_EMOTE_NAMES.length);
-      if (PAL_EMOTE_NAMES[i] === lastEmote.current) {
-        i = (i + 1) % PAL_EMOTE_NAMES.length;
-      }
-      return PAL_EMOTE_NAMES[i];
     };
 
     const speak = () => {
@@ -69,23 +59,24 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
       if (i === lastLine.current) i = (i + 1) % PAL_LINES.length;
       lastLine.current = i;
 
-      setLine(PAL_LINES[i]);
+      const [text, acts] = PAL_LINES[i];
+      setLine(text);
       setTyping(!reduced);
       setTurn((n) => n + 1);
       setShown(true);
 
       if (!reduced) typeTimer = setTimeout(() => setTyping(false), TYPING_MS);
 
-      // Now and then he bends himself into something else while the line is on
-      // screen — always the matching trick when the line names one. Skipped
+      // He acts out what he just said, a beat after the bubble lands. Skipped
       // under reduced motion along with the typing dots.
-      const asked = LINE_EMOTES[PAL_LINES[i]];
-      if (!reduced && (asked || Math.random() < EMOTE_ODDS)) {
-        const e = asked ?? pickEmote();
-        lastEmote.current = e;
-        clearTimeout(emoteTimer);
-        setEmote(e);
-        emoteTimer = setTimeout(() => setEmote(null), PAL_EMOTES[e]);
+      clearTimeout(emoteTimer);
+      clearTimeout(emoteEnd);
+      setEmote(null);
+      if (!reduced) {
+        emoteTimer = setTimeout(() => {
+          setEmote(acts);
+          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTES[acts]);
+        }, EMOTE_DELAY_MS);
       }
 
       phaseTimer = setTimeout(() => {
