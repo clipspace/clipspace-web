@@ -89,6 +89,19 @@ export default function PalSvg({
       <circle className="pal-eye" cx="22" cy="12" r="2.4" fill="#F2EDE0" />
       <circle className="pal-eye" cx="30" cy="12" r="2.4" fill="#F2EDE0" />
 
+      {/* Impact rings where his fingertip meets the glass. Without these a tap
+          toward the viewer has no direction to move in and just reads as
+          pointing sideways — the rings are what say there is a surface there. */}
+      <g
+        className="pal-tap"
+        stroke="#F2EDE0"
+        fill="none"
+        strokeLinecap="round"
+      >
+        <circle cx="42" cy="50" r="3.5" strokeWidth="1.8" />
+        <circle cx="42" cy="50" r="6" strokeWidth="1.2" />
+      </g>
+
       {/* the football, parked off to his right until he kicks it */}
       <circle
         className="pal-ball"
