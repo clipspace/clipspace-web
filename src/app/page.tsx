@@ -119,6 +119,13 @@ function Clipping({
   // two from drifting apart when a tilt is tweaked.
   const higherSide = tiltDeg > 0 ? "left" : "right";
 
+  // Pivot the card about the point the clip grips, so hovering swings the card
+  // straight while the clip itself stays put — the way a clipped note behaves.
+  // The clip is h-12 (3rem) tall and the artwork is 32:92, so it is ~1.04rem
+  // wide; half of that past its left-3/right-3 inset puts its centre at
+  // ~1.27rem, and it grips just inside the top edge.
+  const pivotX = higherSide === "left" ? "1.27rem" : "calc(100% - 1.27rem)";
+
   return (
     <a
       href={href}
@@ -127,23 +134,28 @@ function Clipping({
       /* The tilt rides on a custom property rather than an inline transform,
          so the hover class can still flatten the card — an inline style would
          always win over it. */
-      style={{ "--tilt": `${tiltDeg}deg` } as React.CSSProperties}
-      /* the deep top padding is what keeps the text clear of the clip */
-      className="relative block rounded-lg border border-line bg-surface-2 px-5 pb-4 pt-8 shadow-lg transition-all [rotate:var(--tilt)] hover:border-brass/40 hover:[rotate:0deg]"
+      style={
+        {
+          "--tilt": `${tiltDeg}deg`,
+          transformOrigin: `${pivotX} 0.25rem`,
+        } as React.CSSProperties
+      }
+      /* pt only has to clear the part of the clip that overlaps the card */
+      className="relative block rounded-lg border border-line bg-surface-2 px-5 pb-4 pt-6 shadow-lg transition-all [rotate:var(--tilt)] hover:border-brass/40 hover:[rotate:0deg]"
     >
       {/* Roughly half the clip sits above the edge and half grips the card —
           hang it higher and it stops looking attached to anything. */}
       <Paperclip
         className={
           higherSide === "left"
-            ? "-top-6 left-3 h-12 -scale-x-100"
-            : "-top-6 right-3 h-12"
+            ? "-top-7 left-3 h-12 -scale-x-100"
+            : "-top-7 right-3 h-12"
         }
       />
       <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
         {source}
       </p>
-      <p className="font-display mt-1.5 font-bold leading-snug">{title}</p>
+      <p className="font-display mt-1 font-bold leading-snug">{title}</p>
     </a>
   );
 }
