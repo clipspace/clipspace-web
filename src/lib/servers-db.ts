@@ -5,6 +5,8 @@ export type ServerKind = "official" | "unofficial";
 
 export type ServerEntry = {
   id: string;
+  /** Human-readable identifier, unique across both lists. */
+  slug: string;
   name: string;
   url: string;
   createdAt: string;
@@ -12,10 +14,32 @@ export type ServerEntry = {
 
 type Row = {
   id: string;
+  slug: string | null;
   name: string;
   url: string;
   created_at: Date;
 };
+
+/** Thrown when a slug is already taken, so callers can report it properly. */
+export class DuplicateSlugError extends Error {
+  constructor() {
+    super("slug already in use");
+    this.name = "DuplicateSlugError";
+  }
+}
+
+const UNIQUE_VIOLATION = "23505";
+
+function rethrowSlugConflict(error: unknown): never {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { code?: string }).code === UNIQUE_VIOLATION
+  ) {
+    throw new DuplicateSlugError();
+  }
+  throw error;
+}
 
 // The connection is created lazily so that a build (or a page that never
 // touches the database) doesn't fall over when DATABASE_URL is absent.
@@ -70,6 +94,21 @@ function ensureSchema(): Promise<void> {
         alter table official_servers
         add column if not exists official boolean not null default true
       `;
+      // Slug came later too. It stays nullable in the schema so the migration
+      // can't fail on a table that already has rows; the backfill below gives
+      // every existing row a value, and the app always writes one.
+      await db`
+        alter table official_servers add column if not exists slug text
+      `;
+      await db`
+        update official_servers
+        set slug = 'server-' || left(id::text, 8)
+        where slug is null
+      `;
+      await db`
+        create unique index if not exists official_servers_slug_key
+        on official_servers (slug)
+      `;
     })().catch((err) => {
       // Don't cache a failure: the next request should retry.
       schemaReady = null;
@@ -82,6 +121,7 @@ function ensureSchema(): Promise<void> {
 function toServer(row: Row): ServerEntry {
   return {
     id: row.id,
+    slug: row.slug ?? "",
     name: row.name,
     url: row.url,
     createdAt: row.created_at.toISOString(),
@@ -92,7 +132,7 @@ export async function listServers(kind: ServerKind): Promise<ServerEntry[]> {
   await ensureSchema();
   const db = sql();
   const rows = await db<Row[]>`
-    select id, name, url, created_at
+    select id, slug, name, url, created_at
     from official_servers
     where official = ${kind === "official"}
     order by created_at asc
@@ -101,6 +141,7 @@ export async function listServers(kind: ServerKind): Promise<ServerEntry[]> {
 }
 
 export async function createServer(
+  slug: string,
   name: string,
   url: string,
   kind: ServerKind,
@@ -108,15 +149,16 @@ export async function createServer(
   await ensureSchema();
   const db = sql();
   const [row] = await db<Row[]>`
-    insert into official_servers (name, url, official)
-    values (${name}, ${url}, ${kind === "official"})
-    returning id, name, url, created_at
-  `;
+    insert into official_servers (slug, name, url, official)
+    values (${slug}, ${name}, ${url}, ${kind === "official"})
+    returning id, slug, name, url, created_at
+  `.catch(rethrowSlugConflict);
   return toServer(row);
 }
 
 export async function updateServer(
   id: string,
+  slug: string,
   name: string,
   url: string,
 ): Promise<void> {
@@ -124,9 +166,9 @@ export async function updateServer(
   const db = sql();
   await db`
     update official_servers
-    set name = ${name}, url = ${url}
+    set slug = ${slug}, name = ${name}, url = ${url}
     where id = ${id}
-  `;
+  `.catch(rethrowSlugConflict);
 }
 
 export async function deleteServer(id: string): Promise<void> {

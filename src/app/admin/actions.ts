@@ -16,6 +16,7 @@ import { clientIp, rateLimit } from "@/lib/rate-limit";
 import {
   createServer,
   deleteServer,
+  DuplicateSlugError,
   updateServer,
   type ServerKind,
 } from "@/lib/servers-db";
@@ -62,11 +63,22 @@ export async function logout(): Promise<void> {
   back();
 }
 
-function readFields(formData: FormData): { name: string; url: string } | null {
+// Lowercase ASCII letters, digits and inner hyphens — safe to put in a URL
+// path or a config file without escaping, and stable to type by hand.
+const SLUG_PATTERN = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
+
+function readFields(
+  formData: FormData,
+): { slug: string; name: string; url: string } | null {
+  // Typing an uppercase slug is a slip, not an error worth rejecting.
+  const slug = String(formData.get("slug") ?? "")
+    .trim()
+    .toLowerCase();
   const name = String(formData.get("name") ?? "").trim();
   const url = String(formData.get("url") ?? "").trim();
-  if (!name || !url) return null;
-  if (name.length > 200 || url.length > 2000) return null;
+  if (!slug || !name || !url) return null;
+  if (slug.length > 64 || name.length > 200 || url.length > 2000) return null;
+  if (!SLUG_PATTERN.test(slug)) return null;
 
   let parsed: URL;
   try {
@@ -76,7 +88,7 @@ function readFields(formData: FormData): { name: string; url: string } | null {
   }
   if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
 
-  return { name, url: parsed.toString() };
+  return { slug, name, url: parsed.toString() };
 }
 
 /** The list a form is acting on. Anything unrecognised is treated as
@@ -93,8 +105,14 @@ export async function addServer(formData: FormData): Promise<void> {
   if (!fields) back("invalid");
 
   try {
-    await createServer(fields.name, fields.url, readKind(formData));
+    await createServer(
+      fields.slug,
+      fields.name,
+      fields.url,
+      readKind(formData),
+    );
   } catch (error) {
+    if (error instanceof DuplicateSlugError) back("slug-taken");
     console.error("Failed to add server", error);
     back("db-error");
   }
@@ -111,8 +129,9 @@ export async function editServer(formData: FormData): Promise<void> {
   if (!id || !fields) back("invalid");
 
   try {
-    await updateServer(id, fields.name, fields.url);
+    await updateServer(id, fields.slug, fields.name, fields.url);
   } catch (error) {
+    if (error instanceof DuplicateSlugError) back("slug-taken");
     console.error("Failed to update server", error);
     back("db-error");
   }

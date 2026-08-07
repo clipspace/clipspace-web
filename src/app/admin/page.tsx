@@ -21,7 +21,11 @@ const STATUS_MESSAGES: Record<string, { text: string; tone: "ok" | "bad" }> = {
   deleted: { text: "Server removed.", tone: "ok" },
   "bad-password": { text: "Wrong password.", tone: "bad" },
   throttled: { text: "Too many attempts. Try again later.", tone: "bad" },
-  invalid: { text: "Name is required and the URL must be a valid http(s) address.", tone: "bad" },
+  invalid: {
+    text: "ID must be lowercase letters, digits and hyphens; name is required and the URL must be a valid http(s) address.",
+    tone: "bad",
+  },
+  "slug-taken": { text: "That ID is already used by another server.", tone: "bad" },
   "db-error": { text: "Database error — the change was not saved.", tone: "bad" },
   disabled: { text: "The admin panel is disabled.", tone: "bad" },
 };
@@ -67,6 +71,19 @@ function ServerRow({ server }: { server: ServerEntry }) {
         {/* no `kind` field: edit and delete act on the row's id, and neither
             action moves an entry between lists */}
         <input type="hidden" name="id" value={server.id} />
+        <label className="sr-only" htmlFor={`slug-${server.id}`}>
+          Server ID
+        </label>
+        <input
+          id={`slug-${server.id}`}
+          name="slug"
+          defaultValue={server.slug}
+          required
+          maxLength={64}
+          pattern="[a-z0-9]([a-z0-9\-]*[a-z0-9])?"
+          title="Lowercase letters, digits and hyphens"
+          className={`${inputClass} font-mono sm:flex-1`}
+        />
         <label className="sr-only" htmlFor={`name-${server.id}`}>
           Server name
         </label>
@@ -169,6 +186,19 @@ function ServerSection({
         className="mt-4 flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 sm:flex-row sm:items-center"
       >
         <input type="hidden" name="kind" value={kind} />
+        <label className="sr-only" htmlFor={`${kind}-slug`}>
+          Server ID
+        </label>
+        <input
+          id={`${kind}-slug`}
+          name="slug"
+          required
+          maxLength={64}
+          pattern="[a-z0-9]([a-z0-9\-]*[a-z0-9])?"
+          title="Lowercase letters, digits and hyphens"
+          placeholder="server-id"
+          className={`${inputClass} font-mono sm:flex-1`}
+        />
         <label className="sr-only" htmlFor={`${kind}-name`}>
           Server name
         </label>
