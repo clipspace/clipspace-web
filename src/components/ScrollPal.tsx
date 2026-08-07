@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import PalSvg from "./PalSvg";
 
 // Desktop-only scroll guide.
@@ -158,6 +164,7 @@ const IDLE_ENTER_MS = 12000; // stillness before he wanders off
 // reads as resting, instead of pacing across the screen every few seconds
 const IDLE_WANDER_MS = 20000;
 
+const MIN_PAL_W = 46; // below this he's too small to read; hide him instead
 const GAP = 12; // clearance between the pal and the content column
 const EDGE = 8; // clearance from the screen edge
 
@@ -180,6 +187,15 @@ export default function ScrollPal() {
   const palWRef = useRef(88);
   const nearRef = useRef<{ id: string; lines: string[] }>(STOPS[0]);
   const idle = useRef(false);
+  // drag state: while `dragging` he follows the pointer instead of his target,
+  // and `dropped` keeps him where he was let go until the next scroll
+  const dragging = useRef(false);
+  const dropped = useRef(false);
+  const grab = useRef({ x: 0, y: 0 });
+  const [grabbed, setGrabbed] = useState(false);
+  // false when the side gutter is too narrow to hold him — better to hide
+  // him entirely than to have him stand on top of the text
+  const [roomy, setRoomy] = useState(true);
   // the line last played at each stop, so a random pick can avoid repeating it
   const lineIdx = useRef<Record<string, number>>({});
 
@@ -209,7 +225,11 @@ export default function ScrollPal() {
     const sizePal = () => {
       // as big as the gutter can hold, within a sensible range
       const room = gutter() - GAP - EDGE;
-      const w = Math.max(46, Math.min(92, Math.floor(room)));
+      // Below his minimum width there is no gutter left to stand in, and
+      // clamping would park him on top of the content instead. The root font
+      // size scales with the viewport, so this can happen at any width.
+      setRoomy(room >= MIN_PAL_W);
+      const w = Math.max(MIN_PAL_W, Math.min(92, Math.floor(room)));
       if (w !== palWRef.current) {
         palWRef.current = w;
         setPalW(w);
@@ -340,10 +360,24 @@ export default function ScrollPal() {
     let frame = 0;
 
     const loop = () => {
-      // re-measure a few times a second: reveal animations and layout
-      // shifts move the anchors without firing a scroll event
-      if (++frame % 20 === 0 && !idle.current) computeTarget();
       const c = cur.current;
+
+      // being dragged: he goes exactly where the pointer puts him, and his
+      // target follows so he doesn't snap back the instant he's released
+      if (dragging.current) {
+        target.current.x = c.x;
+        target.current.y = c.y;
+        if (wrapRef.current) {
+          wrapRef.current.style.transform = `translate(${c.x}px, calc(-50% + ${c.y}px))`;
+        }
+        raf = requestAnimationFrame(loop);
+        return;
+      }
+
+      // re-measure a few times a second: reveal animations and layout
+      // shifts move the anchors without firing a scroll event. Skipped while
+      // he's been dropped somewhere, so he stays put until the next scroll.
+      if (++frame % 20 === 0 && !idle.current && !dropped.current) computeTarget();
       const dx = target.current.x - c.x;
       // gentle ease with a speed cap so crossing the screen reads as a brisk
       // walk — 11 was a sprint, 5.5 was a crawl
@@ -416,6 +450,7 @@ export default function ScrollPal() {
 
     const onScroll = () => {
       activity();
+      dropped.current = false; // scrolling sends him back to his post
       computeTarget();
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -441,10 +476,42 @@ export default function ScrollPal() {
     };
   }, []);
 
+  // Drag handlers live outside the animation effect because they only touch
+  // refs the loop already reads. Pointer capture means a fast drag can't
+  // outrun the element and drop him mid-flight.
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    grab.current = {
+      x: e.clientX - cur.current.x,
+      y: e.clientY - (window.innerHeight / 2 + cur.current.y),
+    };
+    dragging.current = true;
+    dropped.current = true;
+    setGrabbed(true);
+  };
+
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!dragging.current) return;
+    cur.current.x = e.clientX - grab.current.x;
+    cur.current.y = e.clientY - grab.current.y - window.innerHeight / 2;
+  };
+
+  const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!dragging.current) return;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    dragging.current = false;
+    setGrabbed(false);
+  };
+
   return (
     <div
       ref={wrapRef}
-      className="pointer-events-none fixed left-0 top-1/2 z-40 hidden min-[1600px]:block"
+      className={`pointer-events-none fixed left-0 top-1/2 z-40 hidden ${
+        roomy ? "min-[1600px]:block" : ""
+      }`}
       style={{ transform: "translate(40px, -50%)" }}
       aria-hidden
     >
@@ -507,7 +574,18 @@ export default function ScrollPal() {
             />
           </div>
         </div>
-        <div ref={palRef}>
+        {/* the only interactive part — the wrapper stays click-through so he
+            never steals a click from the page behind him */}
+        <div
+          ref={palRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          className={`pointer-events-auto touch-none select-none ${
+            grabbed ? "cursor-grabbing" : "cursor-grab"
+          }`}
+        >
           <div className={walking ? "pal-walk" : "pal-idle"}>
             <PalSvg width={palW} walking={walking} />
           </div>

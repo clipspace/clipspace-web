@@ -42,28 +42,26 @@ html {
 }
 
 /* The layout is rem-based, so the root font size is the zoom control.
-   19.36px is 121% of the 16px browser default; the big-screen steps below are
-   the original 17/18/19px ladder scaled by the same 1.21. */
-html { font-size: 19.36px; }
+   14.4px is 90% of the 16px browser default; the big-screen steps below are
+   the original 17/18/19px ladder scaled by the same 0.9. */
+html { font-size: 14.4px; }
 
 @media (min-width: 1400px) {
-  html { font-size: 20.57px; }
+  html { font-size: 15.3px; }
 }
 @media (min-width: 1700px) {
-  html { font-size: 21.78px; }
+  html { font-size: 16.2px; }
 }
 @media (min-width: 2000px) {
-  html { font-size: 22.99px; }
+  html { font-size: 17.1px; }
 }
 
-/* Width of the main content column. Widening this on big screens is what
-   actually eats the empty side margins — scaling the font just makes
-   everything bigger and leaves the same proportion of whitespace.
-   ScrollPal reads this variable to work out his gutter, so it must stay in
-   rem units and stay the single source of truth. */
+/* Width of the main content column. Kept at 72rem — it scales with the root
+   font size above, which is what closes the side margins; widening the column
+   on top of that stretches the two-column sections until their contents look
+   stranded. ScrollPal reads this variable to work out his gutter, so it must
+   stay in rem units and stay the single source of truth. */
 :root { --content-w: 72rem; }
-@media (min-width: 1600px) { :root { --content-w: 84rem; } }
-@media (min-width: 1900px) { :root { --content-w: 92rem; } }
 
 .content-col { max-width: var(--content-w); }
 

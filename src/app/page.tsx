@@ -286,7 +286,9 @@ export default function Home() {
           </div>
           {/* wide screens only: a stack of real press clippings — other
               people saying the same thing, held together by the clip */}
-          <div className="hidden min-[1600px]:block" data-reveal>
+          {/* capped: on a very wide column the corner clips end up stranded
+              at opposite ends of a card that no longer looks like a clipping */}
+          <div className="hidden max-w-sm min-[1600px]:block" data-reveal>
             <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               don&apos;t just take our word for it
             </p>
