@@ -23,6 +23,7 @@ export const PAL_GESTURES = {
   dance: 3000, // sways with the leg kicking out
   wave: 2400, // waves with his leg
   hop: 2200, // a decaying bounce on the spot
+  spin: 1400, // one pirouette
   nod: 1600, // yes
   shake: 1600, // no
 } as const;
