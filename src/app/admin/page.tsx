@@ -37,7 +37,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
       <h1 className="font-display text-3xl font-bold">Admin</h1>
-      <p className="mt-2 text-sm text-muted">Official server list</p>
+      <p className="mt-2 text-sm text-muted">Server lists</p>
       <div className="mt-8">{children}</div>
     </main>
   );
@@ -60,12 +60,13 @@ function StatusBanner({ status }: { status?: string }) {
   );
 }
 
-function ServerRow({ server, kind }: { server: ServerEntry; kind: ServerKind }) {
+function ServerRow({ server }: { server: ServerEntry }) {
   return (
     <li className="rounded-xl border border-line bg-surface p-4">
       <form className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* no `kind` field: edit and delete act on the row's id, and neither
+            action moves an entry between lists */}
         <input type="hidden" name="id" value={server.id} />
-        <input type="hidden" name="kind" value={kind} />
         <label className="sr-only" htmlFor={`name-${server.id}`}>
           Server name
         </label>
@@ -139,7 +140,7 @@ async function ServerList({ kind }: { kind: ServerKind }) {
   return (
     <ul className="flex flex-col gap-3">
       {servers.map((server) => (
-        <ServerRow key={server.id} server={server} kind={kind} />
+        <ServerRow key={server.id} server={server} />
       ))}
     </ul>
   );
