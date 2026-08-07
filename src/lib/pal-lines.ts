@@ -45,4 +45,11 @@ export const PAL_LINES: readonly PalLine[] = [
   ["ta-da. i've been practising that one.", "spin"],
   ["curled up over here, keeping warm. don't mind me.", "curl"],
   ["nobody's watching. might as well dance.", "dance"],
+  ["just checking on the competition. still all ads.", "look"],
+  ["peeked at the big corporate networks. came straight back.", "look"],
+  ["looking left, looking right. no algorithms either way.", "look"],
+  ["found a ball. watch this.", "kick"],
+  ["give it a boot and it still works. sturdy, this.", "kick"],
+  ["oops. that'll buff out, probably.", "crack"],
+  ["...i'll pay for the screen. put it on my tab.", "crack"],
 ] as const;

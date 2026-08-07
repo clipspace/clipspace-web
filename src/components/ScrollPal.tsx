@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import type { PalLine } from "@/lib/pal-lines";
-import PalSvg, { PAL_EMOTE_MS, type PalEmote } from "./PalSvg";
+import PalSvg, { PAL_EMOTES, type PalEmote } from "./PalSvg";
 
 // Desktop-only scroll guide.
 //
@@ -55,6 +55,7 @@ const STOPS: readonly Stop[] = [
       ["the name's clip pal. the pun was not my idea.", "shake"],
       ["tap tap. hello? anyone still out there?", "knock"],
       ["come closer, i want to tell you something.", "lean"],
+      ["found a ball. watch this.", "kick"],
     ],
   },
   {
@@ -78,6 +79,7 @@ const STOPS: readonly Stop[] = [
       ["the good stuff is on by default. no settings dive.", "nod"],
       ["psst. this next bit is my favourite.", "lean"],
       ["look, i can jump. that's the whole trick.", "hop"],
+      ["just checking on the competition. still all ads.", "look"],
     ],
   },
   {
@@ -101,6 +103,7 @@ const STOPS: readonly Stop[] = [
       ["if this feels slower, that's deliberate. enjoy it.", "unbend"],
       ["hang on — i need a proper stretch.", "unbend"],
       ["one leg and still bouncing. respect that.", "hop"],
+      ["peeked at the big corporate networks. came straight back.", "look"],
     ],
   },
   {
@@ -123,6 +126,7 @@ const STOPS: readonly Stop[] = [
       ["clone it, run it, keep it. it's yours now too.", "heart"],
       ["open source isn't a feature. it's the arrangement.", "nod"],
       ["ta-da. i've been practising that one.", "spin"],
+      ["give it a boot and it still works. sturdy, this.", "kick"],
     ],
   },
   {
@@ -145,6 +149,7 @@ const STOPS: readonly Stop[] = [
       ["go on then. the github link's right below me.", "lean"],
       ["same time next scroll? i'll be around.", "wave"],
       ["ahh. that's the good kind of straight.", "unbend"],
+      ["oops. that'll buff out, probably.", "crack"],
     ],
   },
 ];
@@ -177,6 +182,8 @@ const IDLE_STOP: { id: string; lines: readonly PalLine[] } = {
     ["knock knock. you awake in there?", "knock"],
     ["nobody's watching. might as well dance.", "dance"],
     ["hello? tap the glass if you're still there.", "knock"],
+    ["looking left, looking right. no algorithms either way.", "look"],
+    ["...i'll pay for the screen. put it on my tab.", "crack"],
   ],
 };
 const IDLE_ENTER_MS = 12000; // stillness before he wanders off
@@ -494,7 +501,7 @@ export default function ScrollPal() {
         setEmote(null);
         emoteTimer = setTimeout(() => {
           setEmote(acts);
-          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTE_MS);
+          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTES[acts]);
         }, EMOTE_DELAY_MS);
       }
 

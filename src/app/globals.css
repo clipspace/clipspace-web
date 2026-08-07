@@ -179,95 +179,91 @@ html { font-size: 14.4px; }
    question mark gets its point. Browsers without CSS `d` ignore the morphs and
    he stays a paperclip, which is a perfectly good thing to fall back to.
 
-   Every emote runs for the same 5s (PAL_EMOTE_MS in PalSvg). The extra time
-   goes into HOLDING the shape or repeating the beat at its natural tempo —
-   never into slowing the motion down, which would just look broken. */
+   The four morphing emotes run 6.5s: they bend into the shape by 14%, HOLD it
+   until 91% (about five seconds), then bend back. The gestures below them run
+   at whatever length reads naturally — a head shake stretched to five seconds
+   would just look broken. */
 
 /* unwinds into a straight piece of wire and holds the stretch */
 @keyframes pal-unbend {
   0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  20%, 80% { d: path("M25 78 L25 56.3 C25 53.9 25 51.5 25 49.1 C25 46.7 25 44.2 25 41.8 L25 25.6 C25 24 25 22.3 25 20.6 C25 18.9 25 17.3 25 15.6 L25 2.1"); }
+  14%, 91% { d: path("M25 78 L25 56.3 C25 53.9 25 51.5 25 49.1 C25 46.7 25 44.2 25 41.8 L25 25.6 C25 24 25 22.3 25 20.6 C25 18.9 25 17.3 25 15.6 L25 2.1"); }
 }
 @keyframes pal-unbend-leg {
   0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  20%, 80% { d: path("M25 78 C25 78 25 78 25 78 C25 78 25 78 25 78 L25 78"); }
+  14%, 91% { d: path("M25 78 C25 78 25 78 25 78 C25 78 25 78 25 78 L25 78"); }
 }
-/* a real stretch reaches for it: he lengthens while he is straight */
+/* a real stretch reaches for it, twice, while he is straight */
 @keyframes pal-unbend-reach {
   0%, 100% { transform: scaleY(1); }
-  32% { transform: scaleY(1.06); }
-  50% { transform: scaleY(1.02); }
-  68% { transform: scaleY(1.06); }
+  30% { transform: scaleY(1.05); }
+  52% { transform: scaleY(1.01); }
+  74% { transform: scaleY(1.05); }
 }
 
 /* rolls himself up into a tight spiral and unrolls again */
 @keyframes pal-curl {
   0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  22%, 78% { d: path("M27 68 L13 63 C1 54 3 33 21 29 C36 26 44 41 35 52 L32 54 C25 59 15 53 17 44 C19 37 26 36 29 40 L28 45"); }
+  14%, 91% { d: path("M27 68 L13 63 C1 54 3 33 21 29 C36 26 44 41 35 52 L32 54 C25 59 15 53 17 44 C19 37 26 36 29 40 L28 45"); }
 }
 @keyframes pal-curl-leg {
   0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  22%, 78% { d: path("M28 45 C28 45 28 45 28 45 C28 45 28 45 28 45 L28 45"); }
+  14%, 91% { d: path("M28 45 C28 45 28 45 28 45 C28 45 28 45 28 45 L28 45"); }
 }
 
 /* bends into a heart */
 @keyframes pal-heart {
   0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  22%, 78% { d: path("M25 70 L8 45 C1 33 7 20 17 21 C22 22 25 27 25 33 L26 30 C29 21 40 19 44 29 C47 36 43 43 38 48 L28 66"); }
+  14%, 91% { d: path("M25 70 L8 45 C1 33 7 20 17 21 C22 22 25 27 25 33 L26 30 C29 21 40 19 44 29 C47 36 43 43 38 48 L28 66"); }
 }
 /* the leg tucks away into the heart's bottom point */
 @keyframes pal-heart-leg {
   0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  22%, 78% { d: path("M25 70 C25 70 25 70 25 70 C25 70 25 70 25 70 L25 70"); }
+  14%, 91% { d: path("M25 70 C25 70 25 70 25 70 C25 70 25 70 25 70 L25 70"); }
 }
 
 /* bends into a question mark — the eyes stay on, they land inside the hook */
 @keyframes pal-question {
   0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  20%, 80% { d: path("M12 22 L12 18 C12 10 18 5 26 5 C34 5 39 11 39 19 L38 25 C37 32 30 34 27 40 C25 44 25 47 25 50 L25 58"); }
+  14%, 91% { d: path("M12 22 L12 18 C12 10 18 5 26 5 C34 5 39 11 39 19 L38 25 C37 32 30 34 27 40 C25 44 25 47 25 50 L25 58"); }
 }
 /* the leg becomes the dot under the question mark */
 @keyframes pal-question-leg {
   0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  20%, 80% { d: path("M25 68 C25 68 25 68 25 68 C25 68 25 68 25 68 L25 68"); }
+  14%, 91% { d: path("M25 68 C25 68 25 68 25 68 C25 68 25 68 25 68 L25 68"); }
 }
 
 /* the face has nowhere to sit on a bare wire, a spiral or a heart */
 @keyframes pal-face-away {
-  0%, 10% { opacity: 1; }
-  20%, 80% { opacity: 0; }
-  90%, 100% { opacity: 1; }
+  0%, 6% { opacity: 1; }
+  14%, 91% { opacity: 0; }
+  98%, 100% { opacity: 1; }
 }
 
-/* Two full turns with a beat between: scaling X through zero reads as a spin,
-   and one turn stretched over 5s would just look like a slow wobble. */
+/* one clean turn: scaling X through zero reads as a spin */
 @keyframes pal-spin {
   0% { transform: scaleX(1); }
-  7% { transform: scaleX(1.05); }
-  13% { transform: scaleX(-0.04) translateY(-2px); }
-  20% { transform: scaleX(-1); }
-  27% { transform: scaleX(0.04) translateY(-2px); }
-  34%, 52% { transform: scaleX(1); }
-  59% { transform: scaleX(-0.04) translateY(-2px); }
-  66% { transform: scaleX(-1); }
-  73% { transform: scaleX(0.04) translateY(-2px); }
-  80%, 100% { transform: scaleX(1); }
+  10% { transform: scaleX(1.05); }
+  28% { transform: scaleX(-0.04) translateY(-2px); }
+  50% { transform: scaleX(-1); }
+  72% { transform: scaleX(0.04) translateY(-2px); }
+  92%, 100% { transform: scaleX(1); }
 }
 
-/* a good long look left, then right, then back */
+/* a good long look left, a beat, then right */
 @keyframes pal-look-eyes {
   0% { transform: translateX(0); }
-  10%, 26% { transform: translateX(-2.2px); }
-  36% { transform: translateX(0); }
-  46%, 64% { transform: translateX(2.4px); }
-  76%, 100% { transform: translateX(0); }
+  14%, 34% { transform: translateX(-2.4px); }
+  46% { transform: translateX(0); }
+  58%, 80% { transform: translateX(2.4px); }
+  92%, 100% { transform: translateX(0); }
 }
 @keyframes pal-look-tilt {
   0% { transform: rotate(0deg); }
-  16% { transform: rotate(-4deg); }
-  36% { transform: rotate(0deg); }
-  56% { transform: rotate(4deg); }
-  76%, 100% { transform: rotate(0deg); }
+  20%, 34% { transform: rotate(-5deg); }
+  46% { transform: rotate(0deg); }
+  64%, 80% { transform: rotate(5deg); }
+  92%, 100% { transform: rotate(0deg); }
 }
 
 /* Steps up closer to say something and stays there while the line is read.
@@ -275,135 +271,170 @@ html { font-size: 14.4px; }
    and EDGE px to the screen, and anything larger eats into both. */
 @keyframes pal-lean {
   0%, 100% { transform: scale(1) translateY(0); }
-  12%, 84% { transform: scale(1.16) translateY(-3px); }
+  16%, 84% { transform: scale(1.16) translateY(-3px); }
 }
 
-/* A decaying bounce: four hops, each lower than the last, then he stands
-   still. The squash and stretch are inverse on the two axes so his volume
-   looks right. */
+/* A decaying bounce: hops, each lower than the last, then he stands still.
+   The squash and stretch are inverse on the two axes so his volume looks
+   right. */
 @keyframes pal-bounce {
   0% { transform: translateY(0) scale(1, 1); }
-  6% { transform: translateY(0) scale(1.1, 0.88); }
-  16% { transform: translateY(-16px) scale(0.94, 1.08); }
-  26% { transform: translateY(0) scale(1.08, 0.92); }
-  34% { transform: translateY(-11px) scale(0.96, 1.05); }
-  42% { transform: translateY(0) scale(1.06, 0.94); }
-  50% { transform: translateY(-7px) scale(0.98, 1.03); }
-  57% { transform: translateY(0) scale(1.04, 0.96); }
-  63% { transform: translateY(-3px) scale(0.99, 1.01); }
-  69% { transform: translateY(0) scale(1.02, 0.98); }
-  76%, 100% { transform: translateY(0) scale(1, 1); }
+  9% { transform: translateY(0) scale(1.1, 0.88); }
+  25% { transform: translateY(-16px) scale(0.94, 1.08); }
+  40% { transform: translateY(0) scale(1.08, 0.92); }
+  52% { transform: translateY(-10px) scale(0.96, 1.05); }
+  64% { transform: translateY(0) scale(1.06, 0.94); }
+  73% { transform: translateY(-5px) scale(0.98, 1.03); }
+  82% { transform: translateY(0) scale(1.03, 0.97); }
+  90%, 100% { transform: translateY(0) scale(1, 1); }
 }
 
-/* Knocks on the inside of the screen, in four beats: he dips (anticipation),
-   walks up to the glass, winds his leg all the way round, raps four times,
-   waits to see if anyone answers, then backs off. Growing is how he gets
-   "closer" — there is no depth here, so scale has to carry it. */
+/* Knocks on the inside of the screen: he dips, walks up to the glass, puts
+   his leg out straight so it reads as a pointing finger, and raps three times.
+   The scale-up on each tap is him pressing toward you — there is no depth
+   here, so scale has to carry "into the display". */
 @keyframes pal-knock {
   0% { transform: scale(1) rotate(0deg) translateY(0); }
-  4% { transform: scale(0.95) rotate(0deg) translateY(2px); }
-  14% { transform: scale(1.16) rotate(0deg) translateY(-2px); }
-  19% { transform: scale(1.12) rotate(0deg) translateY(0); }
-  27% { transform: scale(1.12) rotate(-4deg) translateY(0); }
-  36% { transform: scale(1.12) rotate(2deg) translateY(0); }
-  41% { transform: scale(1.18) rotate(4deg) translateY(0); }
-  46% { transform: scale(1.1) rotate(-3deg) translateY(0); }
-  51% { transform: scale(1.18) rotate(4deg) translateY(0); }
-  56% { transform: scale(1.1) rotate(-3deg) translateY(0); }
-  61% { transform: scale(1.18) rotate(4deg) translateY(0); }
-  66% { transform: scale(1.1) rotate(-3deg) translateY(0); }
-  71% { transform: scale(1.16) rotate(3deg) translateY(0); }
-  78%, 88% { transform: scale(1.12) rotate(0deg) translateY(0); }
+  6% { transform: scale(0.95) rotate(0deg) translateY(2px); }
+  20% { transform: scale(1.14) rotate(0deg) translateY(-2px); }
+  30% { transform: scale(1.12) rotate(0deg) translateY(0); }
+  44% { transform: scale(1.19) rotate(2deg) translateY(0); }
+  52% { transform: scale(1.11) rotate(-2deg) translateY(0); }
+  62% { transform: scale(1.19) rotate(2deg) translateY(0); }
+  70% { transform: scale(1.11) rotate(-2deg) translateY(0); }
+  80% { transform: scale(1.18) rotate(2deg) translateY(0); }
+  88% { transform: scale(1.12) rotate(0deg) translateY(0); }
   100% { transform: scale(1) rotate(0deg) translateY(0); }
 }
-/* The leg pivots at the hip, so it can wind right round like an arm. It lands
-   on -360deg rather than 0 so the wind-up unwinds instead of snapping back. */
-@keyframes pal-knock-leg {
-  0%, 16% { transform: rotate(0deg); }
-  22% { transform: rotate(38deg); }
-  36% { transform: rotate(-360deg); }
-  41% { transform: rotate(-338deg); }
-  46% { transform: rotate(-374deg); }
-  51% { transform: rotate(-338deg); }
-  56% { transform: rotate(-374deg); }
-  61% { transform: rotate(-338deg); }
-  66% { transform: rotate(-374deg); }
-  71% { transform: rotate(-344deg); }
-  80%, 100% { transform: rotate(-360deg); }
+/* the leg straightens out into a finger and holds it there */
+@keyframes pal-knock-finger {
+  0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+  22%, 88% { d: path("M15 63 C21 63 27 62 33 62 C37 62 41 61 44 61 L48 61"); }
+}
+/* ...and jabs on each rap. Two animations on one element: this one drives
+   transform, the one above drives d, so they compose instead of clashing. */
+@keyframes pal-knock-jab {
+  0%, 30% { transform: rotate(0deg); }
+  44% { transform: rotate(-7deg); }
+  52% { transform: rotate(1deg); }
+  62% { transform: rotate(-7deg); }
+  70% { transform: rotate(1deg); }
+  80% { transform: rotate(-6deg); }
+  92%, 100% { transform: rotate(0deg); }
+}
+
+/* A ball rolls in from the right, he winds up and boots it away. The whole
+   arc stays inside the viewBox so it can never paint over the page. */
+@keyframes pal-kick-ball {
+  0% { opacity: 0; transform: translate(8px, 0); }
+  16% { opacity: 1; transform: translate(-2px, 0); }
+  44% { opacity: 1; transform: translate(-4px, 0); }
+  54% { opacity: 1; transform: translate(-3px, -14px); }
+  100% { opacity: 0; transform: translate(0, -72px) scale(0.75); }
+}
+@keyframes pal-kick-leg {
+  0%, 26% { transform: rotate(0deg); }
+  42% { transform: rotate(26deg); }
+  52% { transform: rotate(-42deg); }
+  68% { transform: rotate(6deg); }
+  84%, 100% { transform: rotate(0deg); }
+}
+@keyframes pal-kick-body {
+  0%, 26% { transform: rotate(0deg); }
+  42% { transform: rotate(4deg); }
+  54% { transform: rotate(-6deg); }
+  70% { transform: rotate(2deg); }
+  84%, 100% { transform: rotate(0deg); }
+}
+
+/* Winds up, thumps the glass, and a crack spreads from the impact before
+   fading out again. */
+@keyframes pal-crack-hit {
+  0% { transform: scale(1) rotate(0deg); }
+  18% { transform: scale(0.94) rotate(-7deg); }
+  30% { transform: scale(1.2) rotate(7deg); }
+  38% { transform: scale(1.08) rotate(-3deg); }
+  48% { transform: scale(1.12) rotate(2deg); }
+  62% { transform: scale(1.05) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes pal-crack-show {
+  0%, 28% { opacity: 0; transform: scale(0.35); }
+  33% { opacity: 0.85; transform: scale(1.06); }
+  40% { opacity: 0.7; transform: scale(1); }
+  70% { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
 }
 
 /* waves with the leg, the way you'd wave an arm */
 @keyframes pal-wave-leg {
   0% { transform: rotate(0deg); }
-  8% { transform: rotate(-54deg); }
-  16% { transform: rotate(-20deg); }
-  24% { transform: rotate(-56deg); }
-  32% { transform: rotate(-20deg); }
-  40% { transform: rotate(-54deg); }
-  48% { transform: rotate(-20deg); }
-  56% { transform: rotate(-56deg); }
-  64% { transform: rotate(-22deg); }
-  72% { transform: rotate(-46deg); }
-  84%, 100% { transform: rotate(0deg); }
+  12% { transform: rotate(-54deg); }
+  26% { transform: rotate(-20deg); }
+  40% { transform: rotate(-56deg); }
+  54% { transform: rotate(-20deg); }
+  68% { transform: rotate(-54deg); }
+  80% { transform: rotate(-24deg); }
+  92%, 100% { transform: rotate(0deg); }
 }
 @keyframes pal-wave-body {
   0%, 100% { transform: rotate(0deg); }
-  10%, 80% { transform: rotate(4deg); }
+  14%, 82% { transform: rotate(4deg); }
 }
 
-/* yes: two nods, a beat, then one more */
+/* yes */
 @keyframes pal-nod {
   0% { transform: translateY(0) scaleY(1); }
-  10% { transform: translateY(4px) scaleY(0.93); }
-  20% { transform: translateY(0) scaleY(1); }
-  30% { transform: translateY(4px) scaleY(0.93); }
-  40%, 56% { transform: translateY(0) scaleY(1); }
-  66% { transform: translateY(4px) scaleY(0.93); }
-  76%, 100% { transform: translateY(0) scaleY(1); }
+  18% { transform: translateY(4px) scaleY(0.93); }
+  36% { transform: translateY(0) scaleY(1); }
+  54% { transform: translateY(4px) scaleY(0.93); }
+  72% { transform: translateY(0) scaleY(1); }
+  86% { transform: translateY(2px) scaleY(0.96); }
+  100% { transform: translateY(0) scaleY(1); }
 }
 
 /* no */
 @keyframes pal-shake {
   0% { transform: rotate(0deg); }
-  8% { transform: rotate(-8deg); }
-  17% { transform: rotate(8deg); }
-  26% { transform: rotate(-7deg); }
-  35% { transform: rotate(6deg); }
-  44% { transform: rotate(-3deg); }
-  52%, 64% { transform: rotate(0deg); }
-  72% { transform: rotate(-7deg); }
-  80% { transform: rotate(6deg); }
-  88% { transform: rotate(-3deg); }
+  14% { transform: rotate(-8deg); }
+  30% { transform: rotate(8deg); }
+  46% { transform: rotate(-7deg); }
+  62% { transform: rotate(6deg); }
+  78% { transform: rotate(-3deg); }
   100% { transform: rotate(0deg); }
 }
 
 /* sways from side to side with the leg kicking out on the beat */
 @keyframes pal-dance {
   0% { transform: rotate(0deg) translateX(0); }
-  10% { transform: rotate(-8deg) translateX(-3px); }
-  20% { transform: rotate(7deg) translateX(3px); }
-  30% { transform: rotate(-7deg) translateX(-3px); }
-  40% { transform: rotate(7deg) translateX(3px); }
-  50% { transform: rotate(-7deg) translateX(-3px); }
-  60% { transform: rotate(7deg) translateX(3px); }
+  14% { transform: rotate(-8deg) translateX(-3px); }
+  28% { transform: rotate(7deg) translateX(3px); }
+  42% { transform: rotate(-7deg) translateX(-3px); }
+  56% { transform: rotate(7deg) translateX(3px); }
   70% { transform: rotate(-6deg) translateX(-2px); }
-  80% { transform: rotate(5deg) translateX(2px); }
-  90% { transform: rotate(-3deg) translateX(-1px); }
+  84% { transform: rotate(5deg) translateX(2px); }
   100% { transform: rotate(0deg) translateX(0); }
 }
 @keyframes pal-dance-leg {
   0% { transform: rotate(0deg); }
-  10% { transform: rotate(30deg); }
-  20% { transform: rotate(-26deg); }
-  30% { transform: rotate(28deg); }
-  40% { transform: rotate(-26deg); }
-  50% { transform: rotate(28deg); }
-  60% { transform: rotate(-24deg); }
-  70% { transform: rotate(22deg); }
-  80% { transform: rotate(-18deg); }
-  90% { transform: rotate(10deg); }
+  14% { transform: rotate(30deg); }
+  28% { transform: rotate(-26deg); }
+  42% { transform: rotate(28deg); }
+  56% { transform: rotate(-26deg); }
+  70% { transform: rotate(24deg); }
+  84% { transform: rotate(-16deg); }
   100% { transform: rotate(0deg); }
 }
+
+/* The props sit in the markup on every pal but stay invisible until the emote
+   that uses them runs. */
+.pal-ball,
+.pal-crack {
+  opacity: 0;
+  transform-box: view-box;
+}
+.pal-ball { transform-origin: 45px 72px; }
+.pal-crack { transform-origin: 28px 27px; }
 
 /* The emotes that move his whole body pivot at his foot, so he pushes off the
    ground rather than floating; the spin turns about his middle. */
@@ -414,45 +445,58 @@ html { font-size: 14.4px; }
 .pal-em-wave,
 .pal-em-nod,
 .pal-em-shake,
-.pal-em-dance {
+.pal-em-dance,
+.pal-em-kick,
+.pal-em-crack {
   transform-origin: 50% 100%;
 }
 
-.pal-em-unbend { animation: pal-unbend-reach 5s ease-in-out both; }
-.pal-em-unbend .pal-body { animation: pal-unbend 5s ease-in-out both; }
-.pal-em-unbend .pal-leg { animation: pal-unbend-leg 5s ease-in-out both; }
-.pal-em-unbend .pal-eye { animation: pal-face-away 5s ease-in-out both; }
+.pal-em-unbend { animation: pal-unbend-reach 6.5s ease-in-out both; }
+.pal-em-unbend .pal-body { animation: pal-unbend 6.5s ease-in-out both; }
+.pal-em-unbend .pal-leg { animation: pal-unbend-leg 6.5s ease-in-out both; }
+.pal-em-unbend .pal-eye { animation: pal-face-away 6.5s ease-in-out both; }
 
-.pal-em-curl .pal-body { animation: pal-curl 5s ease-in-out both; }
-.pal-em-curl .pal-leg { animation: pal-curl-leg 5s ease-in-out both; }
-.pal-em-curl .pal-eye { animation: pal-face-away 5s ease-in-out both; }
+.pal-em-curl .pal-body { animation: pal-curl 6.5s ease-in-out both; }
+.pal-em-curl .pal-leg { animation: pal-curl-leg 6.5s ease-in-out both; }
+.pal-em-curl .pal-eye { animation: pal-face-away 6.5s ease-in-out both; }
 
-.pal-em-heart .pal-body { animation: pal-heart 5s ease-in-out both; }
-.pal-em-heart .pal-leg { animation: pal-heart-leg 5s ease-in-out both; }
-.pal-em-heart .pal-eye { animation: pal-face-away 5s ease-in-out both; }
+.pal-em-heart .pal-body { animation: pal-heart 6.5s ease-in-out both; }
+.pal-em-heart .pal-leg { animation: pal-heart-leg 6.5s ease-in-out both; }
+.pal-em-heart .pal-eye { animation: pal-face-away 6.5s ease-in-out both; }
 
-.pal-em-question .pal-body { animation: pal-question 5s ease-in-out both; }
-.pal-em-question .pal-leg { animation: pal-question-leg 5s ease-in-out both; }
+.pal-em-question .pal-body { animation: pal-question 6.5s ease-in-out both; }
+.pal-em-question .pal-leg { animation: pal-question-leg 6.5s ease-in-out both; }
 
-.pal-em-spin { animation: pal-spin 5s ease-in-out both; }
+.pal-em-spin { animation: pal-spin 1.4s ease-in-out both; }
 
-.pal-em-look { animation: pal-look-tilt 5s ease-in-out both; }
-.pal-em-look .pal-eye { animation: pal-look-eyes 5s ease-in-out both; }
+.pal-em-look { animation: pal-look-tilt 3.2s ease-in-out both; }
+.pal-em-look .pal-eye { animation: pal-look-eyes 3.2s ease-in-out both; }
 
-.pal-em-lean { animation: pal-lean 5s ease-in-out both; }
-.pal-em-hop { animation: pal-bounce 5s ease-out both; }
+.pal-em-lean { animation: pal-lean 4s ease-in-out both; }
+.pal-em-hop { animation: pal-bounce 2.2s ease-out both; }
 
-.pal-em-knock { animation: pal-knock 5s ease-in-out both; }
-.pal-em-knock .pal-leg { animation: pal-knock-leg 5s ease-in-out both; }
+.pal-em-knock { animation: pal-knock 3.4s ease-in-out both; }
+.pal-em-knock .pal-leg {
+  animation: pal-knock-finger 3.4s ease-in-out both,
+    pal-knock-jab 3.4s ease-in-out both;
+}
 
-.pal-em-wave { animation: pal-wave-body 5s ease-in-out both; }
-.pal-em-wave .pal-leg { animation: pal-wave-leg 5s ease-in-out both; }
+.pal-em-kick { animation: pal-kick-body 2.6s ease-in-out both; }
+.pal-em-kick .pal-leg { animation: pal-kick-leg 2.6s ease-in-out both; }
+.pal-em-kick .pal-ball { animation: pal-kick-ball 2.6s ease-out both; }
 
-.pal-em-nod { animation: pal-nod 5s ease-in-out both; }
-.pal-em-shake { animation: pal-shake 5s ease-in-out both; }
+.pal-em-crack { animation: pal-crack-hit 3s ease-in-out both; }
+.pal-em-crack .pal-crack { animation: pal-crack-show 3s ease-out both; }
 
-.pal-em-dance { animation: pal-dance 5s ease-in-out both; }
-.pal-em-dance .pal-leg { animation: pal-dance-leg 5s ease-in-out both; }
+.pal-em-wave { animation: pal-wave-body 2.4s ease-in-out both; }
+.pal-em-wave .pal-leg { animation: pal-wave-leg 2.4s ease-in-out both; }
+
+.pal-em-nod { animation: pal-nod 1.6s ease-in-out both; }
+.pal-em-shake { animation: pal-shake 1.6s ease-in-out both; }
+
+.pal-em-dance { animation: pal-dance 3s ease-in-out both; }
+.pal-em-dance .pal-leg { animation: pal-dance-leg 3s ease-in-out both; }
+
 
 
 /* speech bubble pops in whenever he says something new */
