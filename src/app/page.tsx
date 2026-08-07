@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Logo } from "@/components/Logo";
 import ChatDemo from "@/components/ChatDemo";
 // Every one of the pal's stops is anchored to an element on this page, so he
@@ -5,6 +6,13 @@ import ChatDemo from "@/components/ChatDemo";
 // him to point at.
 import ScrollPal from "@/components/ScrollPal";
 import PalCompanion from "@/components/PalCompanion";
+
+// The same page is reachable on several hosts (the custom domain plus the
+// .vercel.app aliases). Without this, each host looks like a separate copy and
+// Google picks one of them for us.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 /* ---------- small building blocks ---------- */
 

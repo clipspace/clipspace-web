@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "privacy policy – ClipSpace",
   description:
     "How the ClipSpace website handles your data: no cookies, no analytics, no trackers. Just server logs at our hosting provider.",
+  alternates: { canonical: "/privacy" },
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
