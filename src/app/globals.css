@@ -314,15 +314,6 @@ html { font-size: 14.4px; }
 }
 
 /* ---- gestures: play once, land back where they started ---- */
-/* One clean turn. Squeezing scaleX through zero is the flat 2D fake and it
-   read as exactly that; rotateY behind a perspective() gives real
-   foreshortening — the near edge grows as the far edge shrinks. */
-@keyframes pal-spin {
-  0% { transform: perspective(190px) rotateY(0deg); }
-  10% { transform: perspective(190px) rotateY(-28deg); }
-  100% { transform: perspective(190px) rotateY(360deg); }
-}
-
 /* a good long look left, a beat, then right */
 @keyframes pal-look-eyes {
   0% { transform: translateX(0); }
@@ -595,7 +586,7 @@ html { font-size: 14.4px; }
 .pal-tap { transform-origin: 42px 50px; }
 
 /* The emotes that move his whole body pivot at his foot, so he pushes off the
-   ground rather than floating; the spin turns about his middle. */
+   ground rather than floating. */
 .pal-em-lean,
 .pal-em-hop,
 .pal-em-knock,
@@ -608,8 +599,6 @@ html { font-size: 14.4px; }
 .pal-em-unbend {
   transform-origin: 50% 100%;
 }
-
-.pal-em-spin { animation: pal-spin 1.4s ease-in-out both; }
 
 .pal-em-look { animation: pal-look-tilt 3.2s ease-in-out both; }
 .pal-em-look .pal-eye { animation: pal-look-eyes 3.2s ease-in-out both; }
