@@ -385,7 +385,7 @@ html { font-size: 14.4px; }
    anything aimed upward just draws a bar straight through him. */
 @keyframes pal-knock-finger {
   0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  26%, 88% { d: path("M15 63 C21 63 27 62 33 61 C36 60 39 58 40 55 L41 51"); }
+  26%, 88% { d: path("M15 63 C22 64 30 63 36 59 C40 56 43 51 44 47 L44 42"); }
 }
 /* ...and jabs on each rap. Two animations on one element: this one drives
    transform, the one above drives d, so they compose instead of clashing. */
@@ -411,71 +411,84 @@ html { font-size: 14.4px; }
   93%, 100% { opacity: 0; transform: scale(1.3); }
 }
 
-/* A ball rolls in, he keeps it up twice, then boots it away. The per-keyframe
-   timing functions are what give it gravity: ease-out on every rise, ease-in
-   on every fall. A single easing across the whole thing floats. */
+/* A ball rolls in, he keeps it up twice, then boots it away.
+
+   The leg straightens into an actual foot for the duration: while it is curled
+   into its resting loop it covers the whole bottom-right of the frame, which
+   is where the ball has to be, and the two just overlapped into a mess.
+
+   The per-keyframe timing functions are what give the ball gravity — ease-out
+   on every rise, ease-in on every fall. One easing across the whole thing
+   floats. It also never fades in mid-air: it leaves through the edge of the
+   frame at speed, and only then drops to zero. */
+@keyframes pal-kick-plant {
+  0% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+  12%, 76% { d: path("M15 63 C19 66 23 69 27 71 C29 72 31 73 32 74 L34 75"); }
+  100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+}
 @keyframes pal-kick-ball {
   0% {
     opacity: 0;
-    transform: translate(12px, 0) rotate(0deg);
+    transform: translate(16px, 0) rotate(0deg);
     animation-timing-function: ease-out;
   }
-  10% {
+  12% {
     opacity: 1;
-    transform: translate(1px, 0) rotate(-120deg);
+    transform: translate(3px, 0) rotate(-150deg);
     animation-timing-function: linear;
   }
-  22% {
-    transform: translate(0, 0) rotate(-150deg);
+  24% {
+    transform: translate(0, 0) rotate(-190deg);
     animation-timing-function: ease-out;
   }
-  30% {
-    transform: translate(-1px, -21px) rotate(-40deg);
+  33% {
+    transform: translate(-2px, -23px) rotate(-70deg);
     animation-timing-function: ease-in;
   }
-  40% {
-    transform: translate(-1px, 0) rotate(60deg);
+  44% {
+    transform: translate(0, 0) rotate(50deg);
     animation-timing-function: ease-out;
   }
-  48% {
-    transform: translate(-2px, -28px) rotate(190deg);
+  53% {
+    transform: translate(-2px, -31px) rotate(180deg);
     animation-timing-function: ease-in;
   }
-  58% {
-    transform: translate(-2px, 0) rotate(300deg);
+  64% {
+    transform: translate(0, 0) rotate(300deg);
     animation-timing-function: linear;
   }
-  66% {
-    transform: translate(-2px, 0) rotate(320deg);
+  70% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(320deg);
     animation-timing-function: ease-out;
   }
-  100% {
-    opacity: 0;
-    transform: translate(4px, -78px) rotate(680deg) scale(0.75);
+  96%, 100% {
+    opacity: 1;
+    transform: translate(9px, -96px) rotate(760deg);
   }
 }
 /* three swings: up, up, and away */
 @keyframes pal-kick-leg {
-  0%, 18% { transform: rotate(0deg); }
-  24% { transform: rotate(-34deg); }
-  33% { transform: rotate(4deg); }
-  42% { transform: rotate(-38deg); }
-  52% { transform: rotate(4deg); }
-  59% { transform: rotate(30deg); }
-  67% { transform: rotate(-48deg); }
-  80% { transform: rotate(6deg); }
-  92%, 100% { transform: rotate(0deg); }
+  0%, 22% { transform: rotate(0deg); }
+  28% { transform: rotate(-30deg); }
+  38% { transform: rotate(6deg); }
+  47% { transform: rotate(-34deg); }
+  58% { transform: rotate(6deg); }
+  64% { transform: rotate(26deg); }
+  71% { transform: rotate(-44deg); }
+  84% { transform: rotate(4deg); }
+  94%, 100% { transform: rotate(0deg); }
 }
 @keyframes pal-kick-body {
-  0%, 18% { transform: rotate(0deg) translateY(0); }
-  25% { transform: rotate(3deg) translateY(-2px); }
-  34% { transform: rotate(-1deg) translateY(0); }
-  43% { transform: rotate(3deg) translateY(-2px); }
-  53% { transform: rotate(-1deg) translateY(0); }
-  60% { transform: rotate(5deg) translateY(0); }
-  68% { transform: rotate(-7deg) translateY(-2px); }
-  82% { transform: rotate(2deg) translateY(0); }
-  92%, 100% { transform: rotate(0deg) translateY(0); }
+  0%, 22% { transform: rotate(0deg) translateY(0); }
+  29% { transform: rotate(3deg) translateY(-2px); }
+  39% { transform: rotate(-1deg) translateY(0); }
+  48% { transform: rotate(3deg) translateY(-2px); }
+  59% { transform: rotate(-1deg) translateY(0); }
+  65% { transform: rotate(5deg) translateY(0); }
+  72% { transform: rotate(-7deg) translateY(-2px); }
+  86% { transform: rotate(2deg) translateY(0); }
+  94%, 100% { transform: rotate(0deg) translateY(0); }
 }
 
 /* He winds up and strikes the glass with his leg. The leg reaches up the
@@ -590,9 +603,9 @@ html { font-size: 14.4px; }
   opacity: 0;
   transform-box: view-box;
 }
-.pal-ball { transform-origin: 42px 72px; }
+.pal-ball { transform-origin: 42px 71px; }
 .pal-crack { transform-origin: 42px 30px; }
-.pal-tap { transform-origin: 42px 50px; }
+.pal-tap { transform-origin: 44px 44px; }
 
 /* The emotes that move his whole body pivot at his foot, so he pushes off the
    ground rather than floating; the spin turns about his middle. */
@@ -625,7 +638,10 @@ html { font-size: 14.4px; }
 }
 
 .pal-em-kick { animation: pal-kick-body 4.2s ease-in-out both; }
-.pal-em-kick .pal-leg { animation: pal-kick-leg 4.2s ease-in-out both; }
+.pal-em-kick .pal-leg {
+  animation: pal-kick-plant 4.2s ease-in-out both,
+    pal-kick-leg 4.2s ease-in-out both;
+}
 .pal-em-kick .pal-ball { animation: pal-kick-ball 4.2s linear both; }
 
 .pal-em-crack { animation: pal-crack-hit 3s ease-in-out both; }

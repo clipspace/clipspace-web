@@ -113,22 +113,23 @@ export default function PalSvg({
         fill="none"
         strokeLinecap="round"
       >
-        <circle cx="42" cy="50" r="3.5" strokeWidth="1.8" />
-        <circle cx="42" cy="50" r="6" strokeWidth="1.2" />
+        <circle cx="44" cy="44" r="3.8" strokeWidth="1.9" />
+        <circle cx="44" cy="44" r="6.2" strokeWidth="1.3" />
       </g>
 
-      {/* The football, parked off to his right until he kicks it. Solid with a
-          dark panel — a bare ring just read as a hoop. */}
+      {/* The football. Bigger than it was, and parked clear of the leg loop —
+          it used to sit underneath the leg, which is why the kick never read.
+          Solid with a dark panel; a bare ring looked like a hoop. */}
       <g className="pal-ball">
-        <circle cx="42" cy="72" r="5.4" fill="#F2EDE0" />
+        <circle cx="42" cy="71" r="6.6" fill="#F2EDE0" />
         <path
-          d="M42 69.6 L44.3 71.3 L43.4 74 L40.6 74 L39.7 71.3 Z"
+          d="M42 68 L44.8 70 L43.7 73.4 L40.3 73.4 L39.2 70 Z"
           fill="#131f1a"
         />
         <path
-          d="M42 69.6 L42 66.6 M44.3 71.3 L47.2 70.4 M43.4 74 L45.2 76.4 M40.6 74 L38.8 76.4 M39.7 71.3 L36.8 70.4"
+          d="M42 68 L42 64.4 M44.8 70 L48.3 68.9 M43.7 73.4 L45.9 76.3 M40.3 73.4 L38.1 76.3 M39.2 70 L35.7 68.9"
           stroke="#131f1a"
-          strokeWidth="0.9"
+          strokeWidth="1"
           fill="none"
         />
       </g>
