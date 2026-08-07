@@ -1,6 +1,9 @@
 import postgres from "postgres";
 
-export type OfficialServer = {
+/** Which list an entry belongs to. Both are edited from /admin. */
+export type ServerKind = "official" | "unofficial";
+
+export type ServerEntry = {
   id: string;
   name: string;
   url: string;
@@ -60,6 +63,13 @@ function ensureSchema(): Promise<void> {
           created_at timestamptz not null default now()
         )
       `;
+      // Added after the table shipped, so it has to be a separate migration
+      // rather than part of the create above. Existing rows predate the
+      // unofficial list and are all official, which the default covers.
+      await db`
+        alter table official_servers
+        add column if not exists official boolean not null default true
+      `;
     })().catch((err) => {
       // Don't cache a failure: the next request should retry.
       schemaReady = null;
@@ -69,7 +79,7 @@ function ensureSchema(): Promise<void> {
   return schemaReady;
 }
 
-function toServer(row: Row): OfficialServer {
+function toServer(row: Row): ServerEntry {
   return {
     id: row.id,
     name: row.name,
@@ -78,12 +88,13 @@ function toServer(row: Row): OfficialServer {
   };
 }
 
-export async function listServers(): Promise<OfficialServer[]> {
+export async function listServers(kind: ServerKind): Promise<ServerEntry[]> {
   await ensureSchema();
   const db = sql();
   const rows = await db<Row[]>`
     select id, name, url, created_at
     from official_servers
+    where official = ${kind === "official"}
     order by created_at asc
   `;
   return rows.map(toServer);
@@ -92,12 +103,13 @@ export async function listServers(): Promise<OfficialServer[]> {
 export async function createServer(
   name: string,
   url: string,
-): Promise<OfficialServer> {
+  kind: ServerKind,
+): Promise<ServerEntry> {
   await ensureSchema();
   const db = sql();
   const [row] = await db<Row[]>`
-    insert into official_servers (name, url)
-    values (${name}, ${url})
+    insert into official_servers (name, url, official)
+    values (${name}, ${url}, ${kind === "official"})
     returning id, name, url, created_at
   `;
   return toServer(row);

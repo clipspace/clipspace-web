@@ -13,7 +13,12 @@ import {
   verifyPassword,
 } from "@/lib/admin-auth";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { createServer, deleteServer, updateServer } from "@/lib/servers-db";
+import {
+  createServer,
+  deleteServer,
+  updateServer,
+  type ServerKind,
+} from "@/lib/servers-db";
 
 async function clientKey(): Promise<string> {
   return clientIp(await headers());
@@ -74,6 +79,13 @@ function readFields(formData: FormData): { name: string; url: string } | null {
   return { name, url: parsed.toString() };
 }
 
+/** The list a form is acting on. Anything unrecognised is treated as
+ *  unofficial, so a tampered field can't sneak an entry onto the official
+ *  list. */
+function readKind(formData: FormData): ServerKind {
+  return formData.get("kind") === "official" ? "official" : "unofficial";
+}
+
 export async function addServer(formData: FormData): Promise<void> {
   await requireAdmin();
 
@@ -81,7 +93,7 @@ export async function addServer(formData: FormData): Promise<void> {
   if (!fields) back("invalid");
 
   try {
-    await createServer(fields.name, fields.url);
+    await createServer(fields.name, fields.url, readKind(formData));
   } catch (error) {
     console.error("Failed to add server", error);
     back("db-error");

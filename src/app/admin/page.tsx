@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { isAdminEnabled, isAuthenticated } from "@/lib/admin-auth";
-import { isDatabaseConfigured, listServers, type OfficialServer } from "@/lib/servers-db";
+import {
+  isDatabaseConfigured,
+  listServers,
+  type ServerEntry,
+  type ServerKind,
+} from "@/lib/servers-db";
 import { addServer, editServer, login, logout, removeServer } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -55,11 +60,12 @@ function StatusBanner({ status }: { status?: string }) {
   );
 }
 
-function ServerRow({ server }: { server: OfficialServer }) {
+function ServerRow({ server, kind }: { server: ServerEntry; kind: ServerKind }) {
   return (
     <li className="rounded-xl border border-line bg-surface p-4">
       <form className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <input type="hidden" name="id" value={server.id} />
+        <input type="hidden" name="kind" value={kind} />
         <label className="sr-only" htmlFor={`name-${server.id}`}>
           Server name
         </label>
@@ -100,7 +106,7 @@ function ServerRow({ server }: { server: OfficialServer }) {
   );
 }
 
-async function ServerList() {
+async function ServerList({ kind }: { kind: ServerKind }) {
   if (!isDatabaseConfigured()) {
     return (
       <p className="rounded-xl border border-line bg-surface p-6 text-sm text-muted">
@@ -110,11 +116,11 @@ async function ServerList() {
     );
   }
 
-  let servers: OfficialServer[];
+  let servers: ServerEntry[];
   try {
-    servers = await listServers();
+    servers = await listServers(kind);
   } catch (error) {
-    console.error("Failed to load servers for admin panel", error);
+    console.error(`Failed to load ${kind} servers for admin panel`, error);
     return (
       <p className="rounded-xl border border-red-500/40 bg-surface p-6 text-sm text-red-300">
         Could not reach the database.
@@ -125,7 +131,7 @@ async function ServerList() {
   if (servers.length === 0) {
     return (
       <p className="rounded-xl border border-line bg-surface p-6 text-sm text-muted">
-        No servers yet. Add the first one above.
+        No {kind} servers yet. Add the first one above.
       </p>
     );
   }
@@ -133,9 +139,66 @@ async function ServerList() {
   return (
     <ul className="flex flex-col gap-3">
       {servers.map((server) => (
-        <ServerRow key={server.id} server={server} />
+        <ServerRow key={server.id} server={server} kind={kind} />
       ))}
     </ul>
+  );
+}
+
+/** One list: an add form and the existing rows. Rendered once per kind. */
+function ServerSection({
+  kind,
+  heading,
+  blurb,
+  endpoint,
+}: {
+  kind: ServerKind;
+  heading: string;
+  blurb: string;
+  endpoint: string;
+}) {
+  return (
+    <section>
+      <h2 className="font-display text-lg font-semibold">{heading}</h2>
+      <p className="mt-1 text-sm text-muted">
+        {blurb} Served at <code className="text-cream">{endpoint}</code>.
+      </p>
+      <form
+        action={addServer}
+        className="mt-4 flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 sm:flex-row sm:items-center"
+      >
+        <input type="hidden" name="kind" value={kind} />
+        <label className="sr-only" htmlFor={`${kind}-name`}>
+          Server name
+        </label>
+        <input
+          id={`${kind}-name`}
+          name="name"
+          required
+          maxLength={200}
+          placeholder="Name"
+          className={`${inputClass} sm:flex-1`}
+        />
+        <label className="sr-only" htmlFor={`${kind}-url`}>
+          Server URL
+        </label>
+        <input
+          id={`${kind}-url`}
+          name="url"
+          type="url"
+          required
+          maxLength={2000}
+          placeholder="https://example.org"
+          className={`${inputClass} sm:flex-[2]`}
+        />
+        <button type="submit" className={buttonClass}>
+          Add
+        </button>
+      </form>
+      <div className="mt-4">
+        <ServerList kind={kind} />
+      </div>
+    </section>
   );
 }
 
@@ -190,47 +253,21 @@ export default async function AdminPage({
     <Shell>
       <StatusBanner status={status} />
 
-      <section>
-        <h2 className="font-display text-lg font-semibold">Add a server</h2>
-        <form
-          action={addServer}
-          className="mt-3 flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 sm:flex-row sm:items-center"
-        >
-          <label className="sr-only" htmlFor="new-name">
-            Server name
-          </label>
-          <input
-            id="new-name"
-            name="name"
-            required
-            maxLength={200}
-            placeholder="Name"
-            className={`${inputClass} sm:flex-1`}
-          />
-          <label className="sr-only" htmlFor="new-url">
-            Server URL
-          </label>
-          <input
-            id="new-url"
-            name="url"
-            type="url"
-            required
-            maxLength={2000}
-            placeholder="https://example.org"
-            className={`${inputClass} sm:flex-[2]`}
-          />
-          <button type="submit" className={buttonClass}>
-            Add
-          </button>
-        </form>
-      </section>
+      <ServerSection
+        kind="official"
+        heading="Official servers"
+        blurb="Servers run by the project."
+        endpoint="/api/official-servers"
+      />
 
-      <section className="mt-10">
-        <h2 className="font-display text-lg font-semibold">Servers</h2>
-        <div className="mt-3">
-          <ServerList />
-        </div>
-      </section>
+      <div className="mt-12 border-t border-line pt-10">
+        <ServerSection
+          kind="unofficial"
+          heading="Unofficial servers"
+          blurb="Community-run servers listed here but not operated by the project."
+          endpoint="/api/unofficial-servers"
+        />
+      </div>
 
       <form action={logout} className="mt-10">
         <button type="submit" className={ghostButtonClass}>

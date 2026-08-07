@@ -5,7 +5,7 @@ import { corsPreflight, serversResponse } from "@/lib/servers-api";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return serversResponse("official");
+  return serversResponse("unofficial");
 }
 
 export async function OPTIONS() {
