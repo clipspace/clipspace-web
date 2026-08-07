@@ -42,18 +42,18 @@ html {
 }
 
 /* The layout is rem-based, so the root font size is the zoom control.
-   17.6px is 110% of the 16px browser default; the big-screen steps below are
-   the original 17/18/19px ladder scaled by the same 1.1. */
-html { font-size: 17.6px; }
+   19.36px is 121% of the 16px browser default; the big-screen steps below are
+   the original 17/18/19px ladder scaled by the same 1.21. */
+html { font-size: 19.36px; }
 
 @media (min-width: 1400px) {
-  html { font-size: 18.7px; }
+  html { font-size: 20.57px; }
 }
 @media (min-width: 1700px) {
-  html { font-size: 19.8px; }
+  html { font-size: 21.78px; }
 }
 @media (min-width: 2000px) {
-  html { font-size: 20.9px; }
+  html { font-size: 22.99px; }
 }
 
 /* Width of the main content column. Widening this on big screens is what
