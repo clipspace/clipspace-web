@@ -106,26 +106,40 @@ function Clipping({
   href,
   source,
   title,
-  tilt,
+  tiltDeg,
 }: {
   href: string;
   source: string;
   title: React.ReactNode;
-  tilt: string;
+  /** Card tilt. Positive rotates clockwise, which lifts the left edge. */
+  tiltDeg: number;
 }) {
+  // A single clip goes on whichever corner the tilt has raised — a clip on the
+  // low side would read as sliding off. Deriving it from the angle keeps the
+  // two from drifting apart when a tilt is tweaked.
+  const higherSide = tiltDeg > 0 ? "left" : "right";
+
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      /* the deep top padding is what keeps the text clear of both clips */
-      className={`relative block rounded-lg border border-line bg-surface-2 px-5 pb-4 pt-8 shadow-lg transition-all hover:rotate-0 hover:border-brass/40 ${tilt}`}
+      /* The tilt rides on a custom property rather than an inline transform,
+         so the hover class can still flatten the card — an inline style would
+         always win over it. */
+      style={{ "--tilt": `${tiltDeg}deg` } as React.CSSProperties}
+      /* the deep top padding is what keeps the text clear of the clip */
+      className="relative block rounded-lg border border-line bg-surface-2 px-5 pb-4 pt-8 shadow-lg transition-all [rotate:var(--tilt)] hover:border-brass/40 hover:[rotate:0deg]"
     >
-      {/* one clip per top corner, mirrored so they read as a matched pair.
-          Roughly half the clip sits above the edge and half grips the card —
-          hang them higher and they stop looking attached to anything. */}
-      <Paperclip className="-top-6 left-3 h-12 -scale-x-100" />
-      <Paperclip className="-top-6 right-3 h-12" />
+      {/* Roughly half the clip sits above the edge and half grips the card —
+          hang it higher and it stops looking attached to anything. */}
+      <Paperclip
+        className={
+          higherSide === "left"
+            ? "-top-6 left-3 h-12 -scale-x-100"
+            : "-top-6 right-3 h-12"
+        }
+      />
       <p className="text-[11px] font-semibold uppercase tracking-widest text-muted">
         {source}
       </p>
@@ -297,19 +311,19 @@ export default function Home() {
               <Clipping
                 href="https://jacobin.com/2025/10/internet-enshittification-antitrust-tech-doctorow"
                 source="Jacobin"
-                tilt="-rotate-1"
+                tiltDeg={-1}
                 title={<>How to save the internet from &ldquo;enshittification&rdquo;</>}
               />
               <Clipping
                 href="https://www.vice.com/en/article/targeted-advertising-is-ruining-the-internet-and-breaking-the-world/"
                 source="VICE"
-                tilt="rotate-[1.2deg]"
+                tiltDeg={1.2}
                 title="Targeted advertising is ruining the internet and breaking the world"
               />
               <Clipping
                 href="https://privacyinternational.org/long-read/2967/ad-supported-internet-broken-inefficient-and-privacy-nightmare-lets-fix-it"
                 source="Privacy International"
-                tilt="-rotate-[0.6deg]"
+                tiltDeg={-0.6}
                 title="The ad-supported internet is broken, inefficient and a privacy nightmare"
               />
             </div>
