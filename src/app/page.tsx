@@ -6,6 +6,7 @@ import ChatDemo from "@/components/ChatDemo";
 // him to point at.
 import ScrollPal from "@/components/ScrollPal";
 import PalCompanion from "@/components/PalCompanion";
+import { structuredData } from "@/lib/structured-data";
 
 // The same page is reachable on several hosts (the custom domain plus the
 // .vercel.app aliases). Without this, each host looks like a separate copy and
@@ -173,6 +174,13 @@ function Clipping({
 export default function Home() {
   return (
     <main className="flex-1">
+      {/* What the page means, in the form crawlers parse. Not visible, and
+          deliberately says only what the copy below already says. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       {/* nav */}
       <header className="mx-auto flex content-col items-center justify-between px-6 py-5">
         <Logo size={34} textClass="text-xl" />

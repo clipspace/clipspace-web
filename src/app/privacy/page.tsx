@@ -2,11 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
+const TITLE = "privacy policy – ClipSpace";
+const DESCRIPTION =
+  "How the ClipSpace website handles your data: no cookies, no ad trackers, no accounts. Just hosting logs and cookieless, aggregate analytics.";
+
 export const metadata: Metadata = {
-  title: "privacy policy – ClipSpace",
-  description:
-    "How the ClipSpace website handles your data: no cookies, no ad trackers, no accounts. Just hosting logs and cookieless, aggregate analytics.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/privacy" },
+  // Without these the page would inherit the homepage's card and be shared
+  // under the wrong title.
+  openGraph: { title: TITLE, description: DESCRIPTION, url: "/privacy" },
+  twitter: { title: TITLE, description: DESCRIPTION },
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
