@@ -440,6 +440,14 @@ export default function Home() {
             {" · "}
             <a href="https://github.com/clipspace/clipspace-web" className="hover:text-brass hover:underline">GitHub</a>
             {" · "}
+            <a
+              href="https://jachym.djt-group.com"
+              rel="noopener noreferrer"
+              className="hover:text-brass hover:underline"
+            >
+              Portfolio
+            </a>
+            {" · "}
             <a href="mailto:jachym@djt-group.com" className="hover:text-brass hover:underline">Contact</a>
           </p>
         </div>
