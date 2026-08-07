@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PAL_LINES } from "@/lib/pal-lines";
-import PalSvg, { PAL_EMOTES, type PalEmote } from "./PalSvg";
+import PalSvg, {
+  isPose,
+  PAL_GESTURES,
+  PAL_POSE_OUT_MS,
+  type PalEmote,
+} from "./PalSvg";
 
 // The standing pal, for phones and narrower desktops where the walking guide
 // never runs. Every so often a bubble appears over his head, he says one line,
@@ -20,7 +25,10 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
   const [line, setLine] = useState<string>(PAL_LINES[0][0]);
   const [shown, setShown] = useState(false);
   const [typing, setTyping] = useState(true);
-  const [emote, setEmote] = useState<PalEmote | null>(null);
+  const [emote, setEmote] = useState<{ name: PalEmote; out: boolean } | null>(
+    null,
+  );
+  const pose = useRef<PalEmote | null>(null);
   // remounts the bubble so its entrance animation replays each time
   const [turn, setTurn] = useState(0);
   const lastLine = useRef(-1);
@@ -51,6 +59,7 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
       running = false;
       setShown(false);
       setEmote(null);
+      pose.current = null;
     };
 
     const speak = () => {
@@ -72,15 +81,28 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
       clearTimeout(emoteTimer);
       clearTimeout(emoteEnd);
       setEmote(null);
+      pose.current = null;
       if (!reduced) {
         emoteTimer = setTimeout(() => {
-          setEmote(acts);
-          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTES[acts]);
+          setEmote({ name: acts, out: false });
+          if (isPose(acts)) {
+            // a pose stays until the bubble goes away again
+            pose.current = acts;
+          } else {
+            emoteEnd = setTimeout(() => setEmote(null), PAL_GESTURES[acts]);
+          }
         }, EMOTE_DELAY_MS);
       }
 
       phaseTimer = setTimeout(() => {
         setShown(false);
+        // he comes out of the shape as the bubble goes, never by cutting to a
+        // paperclip
+        if (pose.current) {
+          setEmote({ name: pose.current, out: true });
+          pose.current = null;
+          emoteEnd = setTimeout(() => setEmote(null), PAL_POSE_OUT_MS);
+        }
         phaseTimer = setTimeout(speak, GAP_MS);
       }, SHOW_MS);
     };
@@ -136,7 +158,11 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
 
       <div className="animate-float">
         <div className="pal-idle">
-          <PalSvg width={width} emote={emote} />
+          <PalSvg
+            width={width}
+            emote={emote?.name ?? null}
+            emoteOut={emote?.out ?? false}
+          />
         </div>
       </div>
     </div>

@@ -8,7 +8,12 @@ import {
   useState,
 } from "react";
 import type { PalLine } from "@/lib/pal-lines";
-import PalSvg, { PAL_EMOTES, type PalEmote } from "./PalSvg";
+import PalSvg, {
+  isPose,
+  PAL_GESTURES,
+  PAL_POSE_OUT_MS,
+  type PalEmote,
+} from "./PalSvg";
 
 // Desktop-only scroll guide.
 //
@@ -223,7 +228,14 @@ export default function ScrollPal() {
   const [typing, setTyping] = useState(true);
   const [arrivalId, setArrivalId] = useState(0);
   const [walking, setWalking] = useState(false);
-  const [emote, setEmote] = useState<PalEmote | null>(null);
+  // `out` flips a held pose into its unfolding half, so he never snaps back
+  // into a paperclip mid-shape
+  const [emote, setEmote] = useState<{ name: PalEmote; out: boolean } | null>(
+    null,
+  );
+  // the pose he is currently holding, tracked synchronously so the walk
+  // handler can unfold it without waiting on a render
+  const pose = useRef<PalEmote | null>(null);
   const [palW, setPalW] = useState(88);
   const [bubbleW, setBubbleW] = useState(240);
   const [bubSize, setBubSize] = useState<{ w: number; h: number } | null>(null);
@@ -463,13 +475,19 @@ export default function ScrollPal() {
         wasWalking = isWalking;
         setWalking(isWalking);
         if (isWalking) {
-          // he sets off — put the bubble away until he arrives, and drop the
-          // emote: you can't bend yourself into a heart and walk at the same
-          // time
+          // he sets off — put the bubble away until he arrives. A held pose
+          // unfolds on the way out; cutting the class here is what used to
+          // make him teleport back into a paperclip.
           clearTimeout(typeTimer);
           clearTimeout(emoteTimer);
           clearTimeout(emoteEnd);
-          setEmote(null);
+          if (pose.current) {
+            setEmote({ name: pose.current, out: true });
+            pose.current = null;
+            emoteEnd = setTimeout(() => setEmote(null), PAL_POSE_OUT_MS);
+          } else {
+            setEmote(null);
+          }
           setBubbleOn(false);
           shownStop = null;
         }
@@ -495,14 +513,28 @@ export default function ScrollPal() {
         typeTimer = setTimeout(() => setTyping(false), 850);
 
         // Every line comes with the trick that belongs to it — he acts out
-        // what he just said, a beat after the bubble lands.
+        // what he just said, a beat after the bubble lands. Poses then stay
+        // put; gestures clear themselves when their animation is done.
         clearTimeout(emoteTimer);
         clearTimeout(emoteEnd);
-        setEmote(null);
-        emoteTimer = setTimeout(() => {
-          setEmote(acts);
-          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTES[acts]);
-        }, EMOTE_DELAY_MS);
+        const begin = () => {
+          setEmote({ name: acts, out: false });
+          if (isPose(acts)) {
+            pose.current = acts;
+          } else {
+            emoteEnd = setTimeout(() => setEmote(null), PAL_GESTURES[acts]);
+          }
+        };
+        if (pose.current) {
+          // two stops on the same side, no walk between them: unfold the old
+          // shape before folding into the new one
+          setEmote({ name: pose.current, out: true });
+          pose.current = null;
+          emoteTimer = setTimeout(begin, PAL_POSE_OUT_MS);
+        } else {
+          setEmote(null);
+          emoteTimer = setTimeout(begin, EMOTE_DELAY_MS);
+        }
       }
 
       if (wrapRef.current) {
@@ -661,7 +693,12 @@ export default function ScrollPal() {
           }`}
         >
           <div className={walking ? "pal-walk" : "pal-idle"}>
-            <PalSvg width={palW} walking={walking} emote={emote} />
+            <PalSvg
+              width={palW}
+              walking={walking}
+              emote={emote?.name ?? null}
+              emoteOut={emote?.out ?? false}
+            />
           </div>
         </div>
       </div>

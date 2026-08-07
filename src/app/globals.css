@@ -179,67 +179,141 @@ html { font-size: 14.4px; }
    question mark gets its point. Browsers without CSS `d` ignore the morphs and
    he stays a paperclip, which is a perfectly good thing to fall back to.
 
-   The four morphing emotes run 6.5s: they bend into the shape by 14%, HOLD it
-   until 91% (about five seconds), then bend back. The gestures below them run
-   at whatever length reads naturally — a head shake stretched to five seconds
-   would just look broken. */
+   Two kinds of emote:
 
-/* unwinds into a straight piece of wire and holds the stretch */
-@keyframes pal-unbend {
-  0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  14%, 91% { d: path("M25 78 L25 56.3 C25 53.9 25 51.5 25 49.1 C25 46.7 25 44.2 25 41.8 L25 25.6 C25 24 25 22.3 25 20.6 C25 18.9 25 17.3 25 15.6 L25 2.1"); }
+   POSES (unbend, curl, heart, question) bend him into a shape and HOLD it —
+   `forwards`, no return leg — until something tells him to come out of it,
+   which is when the `-out` class takes over and unfolds him. That is why they
+   have no fixed duration: he stays a question mark until he sets off walking.
+
+   GESTURES (everything else) play once and land back where they started. */
+@keyframes pal-unbend-in {
+  from { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
+  to { d: path("M25 78 L25 56.3 C25 53.9 25 51.5 25 49.1 C25 46.7 25 44.2 25 41.8 L25 25.6 C25 24 25 22.3 25 20.6 C25 18.9 25 17.3 25 15.6 L25 2.1"); }
 }
-@keyframes pal-unbend-leg {
-  0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  14%, 91% { d: path("M25 78 C25 78 25 78 25 78 C25 78 25 78 25 78 L25 78"); }
+@keyframes pal-unbend-out {
+  from { d: path("M25 78 L25 56.3 C25 53.9 25 51.5 25 49.1 C25 46.7 25 44.2 25 41.8 L25 25.6 C25 24 25 22.3 25 20.6 C25 18.9 25 17.3 25 15.6 L25 2.1"); }
+  to { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
 }
-/* a real stretch reaches for it, twice, while he is straight */
+@keyframes pal-unbend-leg-in {
+  from { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+  to { d: path("M25 78 C25 78 25 78 25 78 C25 78 25 78 25 78 L25 78"); }
+}
+@keyframes pal-unbend-leg-out {
+  from { d: path("M25 78 C25 78 25 78 25 78 C25 78 25 78 25 78 L25 78"); }
+  to { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+}
+@keyframes pal-curl-in {
+  from { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
+  to { d: path("M10 66 L10 58 C7 45 13 30 27 29 C40 28 47 40 43 49 L42 51 C38 60 26 61 22 53 C18 46 24 39 30 41 L32 44"); }
+}
+@keyframes pal-curl-out {
+  from { d: path("M10 66 L10 58 C7 45 13 30 27 29 C40 28 47 40 43 49 L42 51 C38 60 26 61 22 53 C18 46 24 39 30 41 L32 44"); }
+  to { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
+}
+@keyframes pal-curl-leg-in {
+  from { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+  to { d: path("M32 44 C32 44 32 44 32 44 C32 44 32 44 32 44 L32 44"); }
+}
+@keyframes pal-curl-leg-out {
+  from { d: path("M32 44 C32 44 32 44 32 44 C32 44 32 44 32 44 L32 44"); }
+  to { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+}
+@keyframes pal-heart-in {
+  from { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
+  to { d: path("M25 71 L9 50 C0 38 2 21 15 21 C22 21 25 27 25 34 L26 32 C28 21 40 18 46 29 C51 39 43 46 37 52 L27 67"); }
+}
+@keyframes pal-heart-out {
+  from { d: path("M25 71 L9 50 C0 38 2 21 15 21 C22 21 25 27 25 34 L26 32 C28 21 40 18 46 29 C51 39 43 46 37 52 L27 67"); }
+  to { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
+}
+@keyframes pal-heart-leg-in {
+  from { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+  to { d: path("M25 71 C25 71 25 71 25 71 C25 71 25 71 25 71 L25 71"); }
+}
+@keyframes pal-heart-leg-out {
+  from { d: path("M25 71 C25 71 25 71 25 71 C25 71 25 71 25 71 L25 71"); }
+  to { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+}
+@keyframes pal-question-in {
+  from { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
+  to { d: path("M12 22 L12 18 C12 10 18 5 26 5 C34 5 39 11 39 19 L38 25 C37 32 30 34 27 40 C25 44 25 47 25 50 L25 58"); }
+}
+@keyframes pal-question-out {
+  from { d: path("M12 22 L12 18 C12 10 18 5 26 5 C34 5 39 11 39 19 L38 25 C37 32 30 34 27 40 C25 44 25 47 25 50 L25 58"); }
+  to { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
+}
+@keyframes pal-question-leg-in {
+  from { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+  to { d: path("M25 68 C25 68 25 68 25 68 C25 68 25 68 25 68 L25 68"); }
+}
+@keyframes pal-question-leg-out {
+  from { d: path("M25 68 C25 68 25 68 25 68 C25 68 25 68 25 68 L25 68"); }
+  to { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+}
+/* the face has nowhere to sit on a bare wire, a spiral or a heart */
+@keyframes pal-face-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pal-face-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* a stretch keeps reaching for it while he is straight */
 @keyframes pal-unbend-reach {
   0%, 100% { transform: scaleY(1); }
-  30% { transform: scaleY(1.05); }
-  52% { transform: scaleY(1.01); }
-  74% { transform: scaleY(1.05); }
+  50% { transform: scaleY(1.05); }
+}
+/* Rolling up spins him; unrolling spins him back. Both land on a whole turn,
+   which matters: a continuous spin would have to be cut at an arbitrary angle
+   when the emote ends, and he would jerk upright. Ending on a multiple of
+   360deg means the class can come off at any time without a snap. */
+@keyframes pal-curl-roll {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pal-curl-unroll {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
 }
 
-/* rolls himself up into a tight spiral and unrolls again */
-@keyframes pal-curl {
-  0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  14%, 91% { d: path("M27 68 L13 63 C1 54 3 33 21 29 C36 26 44 41 35 52 L32 54 C25 59 15 53 17 44 C19 37 26 36 29 40 L28 45"); }
+/* ---- poses: bend in, hold, unfold ---- */
+.pal-em-unbend .pal-body { animation: pal-unbend-in 0.9s ease-in-out forwards; }
+.pal-em-unbend .pal-leg { animation: pal-unbend-leg-in 0.9s ease-in-out forwards; }
+.pal-em-unbend .pal-eye { animation: pal-face-out 0.5s ease-in-out forwards; }
+.pal-em-unbend-out .pal-body { animation: pal-unbend-out 0.7s ease-in-out forwards; }
+.pal-em-unbend-out .pal-leg { animation: pal-unbend-leg-out 0.7s ease-in-out forwards; }
+.pal-em-unbend-out .pal-eye { animation: pal-face-in 0.5s ease-in-out 0.3s forwards; }
+
+.pal-em-curl .pal-body { animation: pal-curl-in 0.9s ease-in-out forwards; }
+.pal-em-curl .pal-leg { animation: pal-curl-leg-in 0.9s ease-in-out forwards; }
+.pal-em-curl .pal-eye { animation: pal-face-out 0.5s ease-in-out forwards; }
+.pal-em-curl-out .pal-body { animation: pal-curl-out 0.7s ease-in-out forwards; }
+.pal-em-curl-out .pal-leg { animation: pal-curl-leg-out 0.7s ease-in-out forwards; }
+.pal-em-curl-out .pal-eye { animation: pal-face-in 0.5s ease-in-out 0.3s forwards; }
+
+.pal-em-heart .pal-body { animation: pal-heart-in 0.9s ease-in-out forwards; }
+.pal-em-heart .pal-leg { animation: pal-heart-leg-in 0.9s ease-in-out forwards; }
+.pal-em-heart .pal-eye { animation: pal-face-out 0.5s ease-in-out forwards; }
+.pal-em-heart-out .pal-body { animation: pal-heart-out 0.7s ease-in-out forwards; }
+.pal-em-heart-out .pal-leg { animation: pal-heart-leg-out 0.7s ease-in-out forwards; }
+.pal-em-heart-out .pal-eye { animation: pal-face-in 0.5s ease-in-out 0.3s forwards; }
+
+/* the question mark keeps its eyes — they land inside the hook */
+.pal-em-question .pal-body { animation: pal-question-in 0.9s ease-in-out forwards; }
+.pal-em-question .pal-leg { animation: pal-question-leg-in 0.9s ease-in-out forwards; }
+.pal-em-question-out .pal-body { animation: pal-question-out 0.7s ease-in-out forwards; }
+.pal-em-question-out .pal-leg { animation: pal-question-leg-out 0.7s ease-in-out forwards; }
+
+/* He keeps stretching for as long as he stays straight. */
+.pal-em-unbend { animation: pal-unbend-reach 2.6s ease-in-out 0.9s infinite; }
+
+.pal-em-curl {
+  animation: pal-curl-roll 1.5s cubic-bezier(0.34, 0, 0.2, 1) forwards;
+  transform-origin: 54% 53%;
 }
-@keyframes pal-curl-leg {
-  0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  14%, 91% { d: path("M28 45 C28 45 28 45 28 45 C28 45 28 45 28 45 L28 45"); }
+.pal-em-curl-out {
+  animation: pal-curl-unroll 0.7s ease-in-out forwards;
+  transform-origin: 54% 53%;
 }
 
-/* bends into a heart */
-@keyframes pal-heart {
-  0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  14%, 91% { d: path("M25 70 L8 45 C1 33 7 20 17 21 C22 22 25 27 25 33 L26 30 C29 21 40 19 44 29 C47 36 43 43 38 48 L28 66"); }
-}
-/* the leg tucks away into the heart's bottom point */
-@keyframes pal-heart-leg {
-  0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  14%, 91% { d: path("M25 70 C25 70 25 70 25 70 C25 70 25 70 25 70 L25 70"); }
-}
-
-/* bends into a question mark — the eyes stay on, they land inside the hook */
-@keyframes pal-question {
-  0%, 100% { d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20"); }
-  14%, 91% { d: path("M12 22 L12 18 C12 10 18 5 26 5 C34 5 39 11 39 19 L38 25 C37 32 30 34 27 40 C25 44 25 47 25 50 L25 58"); }
-}
-/* the leg becomes the dot under the question mark */
-@keyframes pal-question-leg {
-  0%, 100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
-  14%, 91% { d: path("M25 68 C25 68 25 68 25 68 C25 68 25 68 25 68 L25 68"); }
-}
-
-/* the face has nowhere to sit on a bare wire, a spiral or a heart */
-@keyframes pal-face-away {
-  0%, 6% { opacity: 1; }
-  14%, 91% { opacity: 0; }
-  98%, 100% { opacity: 1; }
-}
-
+/* ---- gestures: play once, land back where they started ---- */
 /* one clean turn: scaling X through zero reads as a spin */
 @keyframes pal-spin {
   0% { transform: scaleX(1); }
@@ -458,31 +532,15 @@ html { font-size: 14.4px; }
 .pal-em-lean,
 .pal-em-hop,
 .pal-em-knock,
-.pal-em-unbend,
 .pal-em-wave,
 .pal-em-nod,
 .pal-em-shake,
 .pal-em-dance,
 .pal-em-kick,
-.pal-em-crack {
+.pal-em-crack,
+.pal-em-unbend {
   transform-origin: 50% 100%;
 }
-
-.pal-em-unbend { animation: pal-unbend-reach 6.5s ease-in-out both; }
-.pal-em-unbend .pal-body { animation: pal-unbend 6.5s ease-in-out both; }
-.pal-em-unbend .pal-leg { animation: pal-unbend-leg 6.5s ease-in-out both; }
-.pal-em-unbend .pal-eye { animation: pal-face-away 6.5s ease-in-out both; }
-
-.pal-em-curl .pal-body { animation: pal-curl 6.5s ease-in-out both; }
-.pal-em-curl .pal-leg { animation: pal-curl-leg 6.5s ease-in-out both; }
-.pal-em-curl .pal-eye { animation: pal-face-away 6.5s ease-in-out both; }
-
-.pal-em-heart .pal-body { animation: pal-heart 6.5s ease-in-out both; }
-.pal-em-heart .pal-leg { animation: pal-heart-leg 6.5s ease-in-out both; }
-.pal-em-heart .pal-eye { animation: pal-face-away 6.5s ease-in-out both; }
-
-.pal-em-question .pal-body { animation: pal-question 6.5s ease-in-out both; }
-.pal-em-question .pal-leg { animation: pal-question-leg 6.5s ease-in-out both; }
 
 .pal-em-spin { animation: pal-spin 1.4s ease-in-out both; }
 

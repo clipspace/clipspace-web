@@ -11,16 +11,10 @@
 // The ball and the crack are props: invisible until an emote calls for them,
 // and kept inside the viewBox so nothing ever paints over the page.
 
-// Each emote and how long its keyframes run — must match the animation
-// shorthands in globals.css. The four morphing emotes are the long ones: they
-// spend roughly five seconds HOLDING the shape, with a short bend in and out
-// either side. The gestures run at whatever length reads naturally; stretching
-// a head shake to five seconds just looks broken.
-export const PAL_EMOTES = {
-  unbend: 6500, // unwinds into a straight wire, holds it, curls back
-  curl: 6500, // rolls up into a tight spiral, holds, unrolls
-  heart: 6500, // bends into a heart and holds it
-  question: 6500, // bends into a question mark, dot and all, and holds it
+// How long each gesture runs — must match the animation shorthands in
+// globals.css. The four POSES below are absent on purpose: they have no
+// duration because they hold until something tells them to unfold.
+export const PAL_GESTURES = {
   lean: 4000, // steps up close and stays there while the line is read
   look: 3200, // glances left and right, with a beat on each side
   knock: 3400, // walks up, points a finger and taps on the glass
@@ -34,19 +28,39 @@ export const PAL_EMOTES = {
   shake: 1600, // no
 } as const;
 
-export type PalEmote = keyof typeof PAL_EMOTES;
+// Shapes he bends into and stays in. They fold in, hold for as long as he is
+// standing there, and only unfold when he sets off again — which is why they
+// are timed by the caller rather than by a fixed duration.
+export const PAL_POSES = ["unbend", "curl", "heart", "question"] as const;
+
+export const PAL_POSE_IN_MS = 900; // matches the -in animations
+export const PAL_POSE_OUT_MS = 700; // matches the -out animations
+
+export type PalGesture = keyof typeof PAL_GESTURES;
+export type PalPose = (typeof PAL_POSES)[number];
+export type PalEmote = PalGesture | PalPose;
+
+export function isPose(emote: PalEmote): emote is PalPose {
+  return (PAL_POSES as readonly string[]).includes(emote);
+}
 
 export default function PalSvg({
   width = 88,
   walking = false,
   emote = null,
+  emoteOut = false,
 }: {
   width?: number;
   walking?: boolean;
   emote?: PalEmote | null;
+  /** play the pose's unfolding half rather than holding it */
+  emoteOut?: boolean;
 }) {
   const height = Math.round((width * 80) / 50);
-  const classes = [walking ? "pal-walking" : "", emote ? `pal-em-${emote}` : ""]
+  const classes = [
+    walking ? "pal-walking" : "",
+    emote ? `pal-em-${emote}${emoteOut ? "-out" : ""}` : "",
+  ]
     .filter(Boolean)
     .join(" ");
   return (
