@@ -18,7 +18,7 @@ export const PAL_GESTURES = {
   lean: 4000, // steps up close and stays there while the line is read
   look: 3200, // glances left and right, with a beat on each side
   knock: 3400, // walks up, points a finger and taps on the glass
-  kick: 2600, // a ball rolls in, he boots it away
+  kick: 4200, // a ball rolls in, he boots it away
   crack: 3000, // thumps the screen hard enough to crack it
   dance: 3000, // sways with the leg kicking out
   wave: 2400, // waves with his leg
@@ -72,8 +72,9 @@ export default function PalSvg({
       aria-hidden
       className={classes || undefined}
     >
-      {/* the crack he leaves in the screen — behind him, so he stands in front
-          of the damage he just caused */}
+      {/* The crack he leaves in the screen. It radiates from (42,30) — the
+          exact point his leg reaches on the strike — and is drawn behind him,
+          so he stands in front of the damage. */}
       <g
         className="pal-crack"
         stroke="#F2EDE0"
@@ -81,7 +82,7 @@ export default function PalSvg({
         strokeLinecap="round"
         fill="none"
       >
-        <path d="M28 27 L49 4 M28 27 L48 26 M28 27 L45 55 M28 27 L30 1 M28 27 L8 5 M28 27 L1 24 M28 27 L6 52 M28 27 L26 62 M40 15 L47 17 M36 41 L44 40 M15 15 L10 21 M17 42 L9 44" />
+        <path d="M42 30 L48.5 30.0 M42 30 L48.5 22.2 M42 30 L42.0 19.0 M42 30 L34.2 22.2 M42 30 L31.0 30.0 M42 30 L34.2 37.8 M42 30 L42.0 41.0 M42 30 L48.5 37.8 M46.5 30.0 L45.2 26.8 L42.0 25.5 L38.8 26.8 L37.5 30.0 L38.8 33.2 L42.0 34.5 L45.2 33.2 Z M48.5 30.0 L48.0 24.0 L42.0 21.5 L36.0 24.0 L33.5 30.0 L36.0 36.0 L42.0 38.5 L48.0 36.0 Z" />
       </g>
 
       <g
@@ -116,16 +117,21 @@ export default function PalSvg({
         <circle cx="42" cy="50" r="6" strokeWidth="1.2" />
       </g>
 
-      {/* the football, parked off to his right until he kicks it */}
-      <circle
-        className="pal-ball"
-        cx="45"
-        cy="72"
-        r="5"
-        fill="none"
-        stroke="#F2EDE0"
-        strokeWidth="1.6"
-      />
+      {/* The football, parked off to his right until he kicks it. Solid with a
+          dark panel — a bare ring just read as a hoop. */}
+      <g className="pal-ball">
+        <circle cx="42" cy="72" r="5.4" fill="#F2EDE0" />
+        <path
+          d="M42 69.6 L44.3 71.3 L43.4 74 L40.6 74 L39.7 71.3 Z"
+          fill="#131f1a"
+        />
+        <path
+          d="M42 69.6 L42 66.6 M44.3 71.3 L47.2 70.4 M43.4 74 L45.2 76.4 M40.6 74 L38.8 76.4 M39.7 71.3 L36.8 70.4"
+          stroke="#131f1a"
+          strokeWidth="0.9"
+          fill="none"
+        />
+      </g>
     </svg>
   );
 }

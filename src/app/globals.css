@@ -314,14 +314,13 @@ html { font-size: 14.4px; }
 }
 
 /* ---- gestures: play once, land back where they started ---- */
-/* one clean turn: scaling X through zero reads as a spin */
+/* One clean turn. Squeezing scaleX through zero is the flat 2D fake and it
+   read as exactly that; rotateY behind a perspective() gives real
+   foreshortening — the near edge grows as the far edge shrinks. */
 @keyframes pal-spin {
-  0% { transform: scaleX(1); }
-  10% { transform: scaleX(1.05); }
-  28% { transform: scaleX(-0.04) translateY(-2px); }
-  50% { transform: scaleX(-1); }
-  72% { transform: scaleX(0.04) translateY(-2px); }
-  92%, 100% { transform: scaleX(1); }
+  0% { transform: perspective(190px) rotateY(0deg); }
+  10% { transform: perspective(190px) rotateY(-28deg); }
+  100% { transform: perspective(190px) rotateY(360deg); }
 }
 
 /* a good long look left, a beat, then right */
@@ -412,46 +411,104 @@ html { font-size: 14.4px; }
   93%, 100% { opacity: 0; transform: scale(1.3); }
 }
 
-/* A ball rolls in from the right, he winds up and boots it away. The whole
-   arc stays inside the viewBox so it can never paint over the page. */
+/* A ball rolls in, he keeps it up twice, then boots it away. The per-keyframe
+   timing functions are what give it gravity: ease-out on every rise, ease-in
+   on every fall. A single easing across the whole thing floats. */
 @keyframes pal-kick-ball {
-  0% { opacity: 0; transform: translate(8px, 0); }
-  16% { opacity: 1; transform: translate(-2px, 0); }
-  44% { opacity: 1; transform: translate(-4px, 0); }
-  54% { opacity: 1; transform: translate(-3px, -14px); }
-  100% { opacity: 0; transform: translate(0, -72px) scale(0.75); }
+  0% {
+    opacity: 0;
+    transform: translate(12px, 0) rotate(0deg);
+    animation-timing-function: ease-out;
+  }
+  10% {
+    opacity: 1;
+    transform: translate(1px, 0) rotate(-120deg);
+    animation-timing-function: linear;
+  }
+  22% {
+    transform: translate(0, 0) rotate(-150deg);
+    animation-timing-function: ease-out;
+  }
+  30% {
+    transform: translate(-1px, -21px) rotate(-40deg);
+    animation-timing-function: ease-in;
+  }
+  40% {
+    transform: translate(-1px, 0) rotate(60deg);
+    animation-timing-function: ease-out;
+  }
+  48% {
+    transform: translate(-2px, -28px) rotate(190deg);
+    animation-timing-function: ease-in;
+  }
+  58% {
+    transform: translate(-2px, 0) rotate(300deg);
+    animation-timing-function: linear;
+  }
+  66% {
+    transform: translate(-2px, 0) rotate(320deg);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(4px, -78px) rotate(680deg) scale(0.75);
+  }
 }
+/* three swings: up, up, and away */
 @keyframes pal-kick-leg {
-  0%, 26% { transform: rotate(0deg); }
-  42% { transform: rotate(26deg); }
-  52% { transform: rotate(-42deg); }
-  68% { transform: rotate(6deg); }
-  84%, 100% { transform: rotate(0deg); }
+  0%, 18% { transform: rotate(0deg); }
+  24% { transform: rotate(-34deg); }
+  33% { transform: rotate(4deg); }
+  42% { transform: rotate(-38deg); }
+  52% { transform: rotate(4deg); }
+  59% { transform: rotate(30deg); }
+  67% { transform: rotate(-48deg); }
+  80% { transform: rotate(6deg); }
+  92%, 100% { transform: rotate(0deg); }
 }
 @keyframes pal-kick-body {
-  0%, 26% { transform: rotate(0deg); }
-  42% { transform: rotate(4deg); }
-  54% { transform: rotate(-6deg); }
-  70% { transform: rotate(2deg); }
-  84%, 100% { transform: rotate(0deg); }
+  0%, 18% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(3deg) translateY(-2px); }
+  34% { transform: rotate(-1deg) translateY(0); }
+  43% { transform: rotate(3deg) translateY(-2px); }
+  53% { transform: rotate(-1deg) translateY(0); }
+  60% { transform: rotate(5deg) translateY(0); }
+  68% { transform: rotate(-7deg) translateY(-2px); }
+  82% { transform: rotate(2deg) translateY(0); }
+  92%, 100% { transform: rotate(0deg) translateY(0); }
 }
 
-/* Winds up, thumps the glass, and a crack spreads from the impact before
-   fading out again. */
-@keyframes pal-crack-hit {
-  0% { transform: scale(1) rotate(0deg); }
-  18% { transform: scale(0.94) rotate(-7deg); }
-  30% { transform: scale(1.2) rotate(7deg); }
-  38% { transform: scale(1.08) rotate(-3deg); }
-  48% { transform: scale(1.12) rotate(2deg); }
-  62% { transform: scale(1.05) rotate(-1deg); }
-  100% { transform: scale(1) rotate(0deg); }
+/* He winds up and strikes the glass with his leg. The leg reaches up the
+   RIGHT side rather than straight up: the hip pivot is at the bottom left, so
+   anything aimed up the middle just draws a bar through his body. The crack
+   in PalSvg radiates from (42,30), which is where this puts his tip. */
+@keyframes pal-crack-leg {
+  0%, 16% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
+  30%, 72% { d: path("M15 63 C24 66 33 64 39 58 C42 53 42 46 42 41 L42 35"); }
+  100% { d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54"); }
 }
+@keyframes pal-crack-swing {
+  0%, 14% { transform: rotate(0deg); }
+  22% { transform: rotate(14deg); }
+  30% { transform: rotate(-9deg); }
+  40% { transform: rotate(-2deg); }
+  72%, 100% { transform: rotate(0deg); }
+}
+@keyframes pal-crack-hit {
+  0% { transform: scale(1) rotate(0deg) translateY(0); }
+  18% { transform: scale(0.95) rotate(-6deg) translateY(2px); }
+  30% { transform: scale(1.14) rotate(6deg) translateY(-2px); }
+  38% { transform: scale(1.04) rotate(-3deg) translateY(1px); }
+  50% { transform: scale(1.07) rotate(2deg) translateY(0); }
+  66% { transform: scale(1.02) rotate(-1deg) translateY(0); }
+  100% { transform: scale(1) rotate(0deg) translateY(0); }
+}
+/* the crack lands on the frame the leg arrives, then fades */
 @keyframes pal-crack-show {
-  0%, 28% { opacity: 0; transform: scale(0.35); }
-  33% { opacity: 0.85; transform: scale(1.06); }
-  40% { opacity: 0.7; transform: scale(1); }
-  70% { opacity: 0.7; transform: scale(1); }
+  0%, 28% { opacity: 0; transform: scale(0.25); }
+  31% { opacity: 0.95; transform: scale(1.08); }
+  37% { opacity: 0.8; transform: scale(1); }
+  74% { opacity: 0.8; transform: scale(1); }
   100% { opacity: 0; transform: scale(1); }
 }
 
@@ -493,16 +550,26 @@ html { font-size: 14.4px; }
   100% { transform: rotate(0deg); }
 }
 
-/* sways from side to side with the leg kicking out on the beat */
+/* Sways from side to side — hips, bob, squash and a glance on each beat, not
+   just a leg swinging under a rigid body. */
 @keyframes pal-dance {
-  0% { transform: rotate(0deg) translateX(0); }
-  14% { transform: rotate(-8deg) translateX(-3px); }
-  28% { transform: rotate(7deg) translateX(3px); }
-  42% { transform: rotate(-7deg) translateX(-3px); }
-  56% { transform: rotate(7deg) translateX(3px); }
-  70% { transform: rotate(-6deg) translateX(-2px); }
-  84% { transform: rotate(5deg) translateX(2px); }
-  100% { transform: rotate(0deg) translateX(0); }
+  0% { transform: rotate(0deg) translate(0, 0) scale(1, 1); }
+  14% { transform: rotate(-9deg) translate(-3px, -4px) scale(0.97, 1.04); }
+  28% { transform: rotate(7deg) translate(3px, 0) scale(1.04, 0.96); }
+  42% { transform: rotate(-8deg) translate(-3px, -4px) scale(0.97, 1.04); }
+  56% { transform: rotate(7deg) translate(3px, 0) scale(1.04, 0.96); }
+  70% { transform: rotate(-6deg) translate(-2px, -3px) scale(0.98, 1.03); }
+  84% { transform: rotate(5deg) translate(2px, 0) scale(1.03, 0.97); }
+  100% { transform: rotate(0deg) translate(0, 0) scale(1, 1); }
+}
+@keyframes pal-dance-eyes {
+  0%, 100% { transform: translateX(0); }
+  14% { transform: translateX(-1.7px); }
+  28% { transform: translateX(1.7px); }
+  42% { transform: translateX(-1.7px); }
+  56% { transform: translateX(1.7px); }
+  70% { transform: translateX(-1.2px); }
+  84% { transform: translateX(1px); }
 }
 @keyframes pal-dance-leg {
   0% { transform: rotate(0deg); }
@@ -523,8 +590,8 @@ html { font-size: 14.4px; }
   opacity: 0;
   transform-box: view-box;
 }
-.pal-ball { transform-origin: 45px 72px; }
-.pal-crack { transform-origin: 28px 27px; }
+.pal-ball { transform-origin: 42px 72px; }
+.pal-crack { transform-origin: 42px 30px; }
 .pal-tap { transform-origin: 42px 50px; }
 
 /* The emotes that move his whole body pivot at his foot, so he pushes off the
@@ -557,12 +624,16 @@ html { font-size: 14.4px; }
     pal-knock-jab 3.4s ease-in-out both;
 }
 
-.pal-em-kick { animation: pal-kick-body 2.6s ease-in-out both; }
-.pal-em-kick .pal-leg { animation: pal-kick-leg 2.6s ease-in-out both; }
-.pal-em-kick .pal-ball { animation: pal-kick-ball 2.6s ease-out both; }
+.pal-em-kick { animation: pal-kick-body 4.2s ease-in-out both; }
+.pal-em-kick .pal-leg { animation: pal-kick-leg 4.2s ease-in-out both; }
+.pal-em-kick .pal-ball { animation: pal-kick-ball 4.2s linear both; }
 
 .pal-em-crack { animation: pal-crack-hit 3s ease-in-out both; }
 .pal-em-crack .pal-crack { animation: pal-crack-show 3s ease-out both; }
+.pal-em-crack .pal-leg {
+  animation: pal-crack-leg 3s ease-in-out both,
+    pal-crack-swing 3s ease-in-out both;
+}
 
 .pal-em-wave { animation: pal-wave-body 2.4s ease-in-out both; }
 .pal-em-wave .pal-leg { animation: pal-wave-leg 2.4s ease-in-out both; }
@@ -572,6 +643,7 @@ html { font-size: 14.4px; }
 
 .pal-em-dance { animation: pal-dance 3s ease-in-out both; }
 .pal-em-dance .pal-leg { animation: pal-dance-leg 3s ease-in-out both; }
+.pal-em-dance .pal-eye { animation: pal-dance-eyes 3s ease-in-out both; }
 
 
 
