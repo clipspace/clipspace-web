@@ -7,7 +7,12 @@ import {
   useRef,
   useState,
 } from "react";
-import PalSvg from "./PalSvg";
+import { LINE_EMOTES } from "@/lib/pal-lines";
+import PalSvg, {
+  PAL_EMOTES,
+  PAL_EMOTE_NAMES,
+  type PalEmote,
+} from "./PalSvg";
 
 // Desktop-only scroll guide.
 //
@@ -44,6 +49,8 @@ const STOPS = [
       "bit of an odd mascot, i'll admit. grew on people.",
       "you can read the whole page. it's short, i promise.",
       "the name's clip pal. the pun was not my idea.",
+      "tap tap. hello? anyone still out there?",
+      "come closer, i want to tell you something.",
     ],
   },
   {
@@ -65,6 +72,8 @@ const STOPS = [
       "an app that doesn't want your attention. imagine.",
       "no engagement metrics. nobody's chasing your time.",
       "the good stuff is on by default. no settings dive.",
+      "psst. this next bit is my favourite.",
+      "look, i can jump. that's the whole trick.",
     ],
   },
   {
@@ -86,6 +95,8 @@ const STOPS = [
       "everything got louder. this is the quiet corner.",
       "small software, made on purpose. that's the pitch.",
       "if this feels slower, that's deliberate. enjoy it.",
+      "hang on — i need a proper stretch.",
+      "one leg and still bouncing. respect that.",
     ],
   },
   {
@@ -107,6 +118,7 @@ const STOPS = [
       "issues are open. opinions welcome, patches better.",
       "clone it, run it, keep it. it's yours now too.",
       "open source isn't a feature. it's the arrangement.",
+      "ta-da. i've been practising that one.",
     ],
   },
   {
@@ -128,6 +140,7 @@ const STOPS = [
       "that's the footer down there. mind the step.",
       "go on then. the github link's right below me.",
       "same time next scroll? i'll be around.",
+      "ahh. that's the good kind of straight.",
     ],
   },
 ];
@@ -157,6 +170,7 @@ const IDLE_STOP = {
     "somewhere a server is idling with me. solidarity.",
     "take your time. the page isn't going anywhere.",
     "i straightened myself out a bit. bent back now.",
+    "knock knock. you awake in there?",
   ],
 };
 const IDLE_ENTER_MS = 12000; // stillness before he wanders off
@@ -183,9 +197,11 @@ const LEAN_EASE = 7.67; // likewise, ≈0.12 per frame at 60Hz
 const WALK_SPEED = 27; // px/s above which he counts as walking (was 0.45/frame)
 const FACE_SPEED = 36; // px/s above which he turns to face his direction
 const RETARGET_MS = 330; // how often to re-measure the anchors
-const UNBEND_MS = 2600; // must match the pal-unbend keyframes in globals.css
-// He is guaranteed to do the trick when he has just claimed he did it.
-const STRETCH_LINE = "i straightened myself out a bit. bent back now.";
+// How often an arrival comes with an emote. Rare enough at a normal stop that
+// catching one feels like a find; more likely while he's idling and has
+// nothing else to do.
+const EMOTE_ODDS = 0.18;
+const IDLE_EMOTE_ODDS = 0.4;
 
 export default function ScrollPal() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -196,7 +212,9 @@ export default function ScrollPal() {
   const [typing, setTyping] = useState(true);
   const [arrivalId, setArrivalId] = useState(0);
   const [walking, setWalking] = useState(false);
-  const [stretching, setStretching] = useState(false);
+  const [emote, setEmote] = useState<PalEmote | null>(null);
+  // the emote last played, so a random pick can avoid repeating it
+  const lastEmote = useRef<PalEmote | null>(null);
   const [palW, setPalW] = useState(88);
   const [bubbleW, setBubbleW] = useState(240);
   const [bubSize, setBubSize] = useState<{ w: number; h: number } | null>(null);
@@ -377,9 +395,18 @@ export default function ScrollPal() {
     let wasWalking = false;
     let shownStop: string | null = null; // stop whose line the bubble shows
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
-    let stretchTimer: ReturnType<typeof setTimeout> | undefined;
+    let emoteTimer: ReturnType<typeof setTimeout> | undefined;
     let last = performance.now();
     let lastRetarget = 0;
+
+    // random trick, never the same one twice running
+    const pickEmote = (): PalEmote => {
+      let i = Math.floor(Math.random() * PAL_EMOTE_NAMES.length);
+      if (PAL_EMOTE_NAMES[i] === lastEmote.current) {
+        i = (i + 1) % PAL_EMOTE_NAMES.length;
+      }
+      return PAL_EMOTE_NAMES[i];
+    };
 
     const loop = (now: number) => {
       const c = cur.current;
@@ -436,10 +463,11 @@ export default function ScrollPal() {
         setWalking(isWalking);
         if (isWalking) {
           // he sets off — put the bubble away until he arrives, and drop the
-          // stretch: you can't unwind yourself and walk at the same time
+          // emote: you can't bend yourself into a heart and walk at the same
+          // time
           clearTimeout(typeTimer);
-          clearTimeout(stretchTimer);
-          setStretching(false);
+          clearTimeout(emoteTimer);
+          setEmote(null);
           setBubbleOn(false);
           shownStop = null;
         }
@@ -463,14 +491,16 @@ export default function ScrollPal() {
         setArrivalId((n) => n + 1);
         typeTimer = setTimeout(() => setTyping(false), 850);
 
-        // Standing still is when he can afford to unwind. Rare enough at a
-        // normal stop that catching it feels like a find, more likely while
-        // he's idling, and certain when the line says he just did it.
-        const odds = s.id === IDLE_STOP.id ? 0.4 : 0.18;
-        if (s.lines[i] === STRETCH_LINE || Math.random() < odds) {
-          clearTimeout(stretchTimer);
-          setStretching(true);
-          stretchTimer = setTimeout(() => setStretching(false), UNBEND_MS);
+        // Standing still is when he can afford to bend himself into shapes.
+        // A line that describes a particular trick always gets that trick;
+        // otherwise it's an occasional random one.
+        const asked = LINE_EMOTES[s.lines[i]];
+        if (asked || Math.random() < (s.id === IDLE_STOP.id ? IDLE_EMOTE_ODDS : EMOTE_ODDS)) {
+          const e = asked ?? pickEmote();
+          lastEmote.current = e;
+          clearTimeout(emoteTimer);
+          setEmote(e);
+          emoteTimer = setTimeout(() => setEmote(null), PAL_EMOTES[e]);
         }
       }
 
@@ -507,8 +537,8 @@ export default function ScrollPal() {
       cancelAnimationFrame(raf);
       clearTimeout(typeTimer);
       clearTimeout(idleTimer);
-      clearTimeout(stretchTimer);
-      window.removeEventListener("scroll", onScroll);
+      clearTimeout(emoteTimer);
+  window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", computeTarget);
       window.removeEventListener("mousemove", activity);
       window.removeEventListener("keydown", activity);
@@ -629,7 +659,7 @@ export default function ScrollPal() {
           }`}
         >
           <div className={walking ? "pal-walk" : "pal-idle"}>
-            <PalSvg width={palW} walking={walking} unbending={stretching} />
+            <PalSvg width={palW} walking={walking} emote={emote} />
           </div>
         </div>
       </div>

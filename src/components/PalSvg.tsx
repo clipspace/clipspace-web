@@ -2,24 +2,41 @@
 // so the leg can swing on its own — its pivot sits at the hip, where the leg
 // wire leaves the body (15,63 in viewBox units). `walking` turns the step on.
 //
-// `unbending` plays the party trick: the wire straightens out and curls back
-// up. The straightened shapes live in globals.css next to the keyframes, and
-// they mirror the command sequence of the paths below — same commands in the
-// same order is what lets the browser tween one into the other.
+// `emote` plays one of his party tricks. The morphing ones rewrite the body
+// and leg paths from globals.css; every target shape there keeps the exact
+// command sequence of the paths below (M L C C L C C L for the body, M C C L
+// for the leg), because same commands in the same order is what lets the
+// browser tween one shape into the other instead of cutting between them.
+
+// Each emote and how long its keyframes run. The durations must match the
+// animation shorthands in globals.css — they are here so callers can time the
+// class removal without duplicating the numbers.
+export const PAL_EMOTES = {
+  unbend: 4600, // unwinds into a straight wire, holds the stretch, curls back
+  heart: 3000, // bends into a heart
+  question: 2600, // bends into a question mark, dot and all
+  spin: 1100, // pirouette
+  look: 1900, // glances left and right
+  lean: 2400, // steps up closer to say something
+  hop: 1600, // bounces on the spot
+  knock: 1900, // taps on the inside of the screen
+} as const;
+
+export type PalEmote = keyof typeof PAL_EMOTES;
+
+export const PAL_EMOTE_NAMES = Object.keys(PAL_EMOTES) as PalEmote[];
+
 export default function PalSvg({
   width = 88,
   walking = false,
-  unbending = false,
+  emote = null,
 }: {
   width?: number;
   walking?: boolean;
-  unbending?: boolean;
+  emote?: PalEmote | null;
 }) {
   const height = Math.round((width * 80) / 50);
-  const classes = [
-    walking ? "pal-walking" : "",
-    unbending ? "pal-unbending" : "",
-  ]
+  const classes = [walking ? "pal-walking" : "", emote ? `pal-em-${emote}` : ""]
     .filter(Boolean)
     .join(" ");
   return (
