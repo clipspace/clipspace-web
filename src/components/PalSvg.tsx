@@ -8,26 +8,29 @@
 // for the leg), because same commands in the same order is what lets the
 // browser tween one shape into the other instead of cutting between them.
 
-// Each emote and how long its keyframes run. The durations must match the
-// animation shorthands in globals.css — they are here so callers can time the
-// class removal without duplicating the numbers.
-export const PAL_EMOTES = {
-  unbend: 4600, // unwinds into a straight wire, holds the stretch, curls back
-  curl: 3400, // rolls himself up into a tight spiral and unrolls
-  heart: 3000, // bends into a heart
-  question: 2600, // bends into a question mark, dot and all
-  spin: 1100, // pirouette
-  look: 1900, // glances left and right
-  lean: 2400, // steps up closer to say something
-  hop: 1600, // bounces on the spot
-  knock: 3600, // walks up, winds his leg, taps the glass, backs off
-  wave: 2200, // waves with his leg
-  nod: 1500, // yes
-  shake: 1500, // no
-  dance: 2600, // sways with the leg kicking out
-} as const;
+// Every emote runs for the same length, so callers can time the class removal
+// from one number. Must match the animation shorthands in globals.css, where
+// the extra time goes into holding the shape or repeating the beat rather than
+// into slowing the motion down.
+export const PAL_EMOTE_MS = 5000;
 
-export type PalEmote = keyof typeof PAL_EMOTES;
+export const PAL_EMOTES = [
+  "unbend", // unwinds into a straight wire, holds the stretch, curls back
+  "curl", // rolls himself up into a tight spiral and unrolls
+  "heart", // bends into a heart
+  "question", // bends into a question mark, dot and all
+  "spin", // two pirouettes with a beat between
+  "look", // glances left and right
+  "lean", // steps up closer to say something
+  "hop", // a decaying bounce on the spot
+  "knock", // walks up, winds his leg, taps the glass, backs off
+  "wave", // waves with his leg
+  "nod", // yes
+  "shake", // no
+  "dance", // sways with the leg kicking out
+] as const;
+
+export type PalEmote = (typeof PAL_EMOTES)[number];
 
 export default function PalSvg({
   width = 88,

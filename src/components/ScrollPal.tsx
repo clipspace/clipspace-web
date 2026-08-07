@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import type { PalLine } from "@/lib/pal-lines";
-import PalSvg, { PAL_EMOTES, type PalEmote } from "./PalSvg";
+import PalSvg, { PAL_EMOTE_MS, type PalEmote } from "./PalSvg";
 
 // Desktop-only scroll guide.
 //
@@ -494,7 +494,7 @@ export default function ScrollPal() {
         setEmote(null);
         emoteTimer = setTimeout(() => {
           setEmote(acts);
-          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTES[acts]);
+          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTE_MS);
         }, EMOTE_DELAY_MS);
       }
 

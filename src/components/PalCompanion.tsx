@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PAL_LINES } from "@/lib/pal-lines";
-import PalSvg, { PAL_EMOTES, type PalEmote } from "./PalSvg";
+import PalSvg, { PAL_EMOTE_MS, type PalEmote } from "./PalSvg";
 
 // The standing pal, for phones and narrower desktops where the walking guide
 // never runs. Every so often a bubble appears over his head, he says one line,
@@ -75,7 +75,7 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
       if (!reduced) {
         emoteTimer = setTimeout(() => {
           setEmote(acts);
-          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTES[acts]);
+          emoteEnd = setTimeout(() => setEmote(null), PAL_EMOTE_MS);
         }, EMOTE_DELAY_MS);
       }
 
