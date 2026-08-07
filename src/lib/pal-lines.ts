@@ -21,6 +21,7 @@ export const PAL_LINES = [
   "small circles beat a firehose. every time.",
   "boring privacy defaults. the good kind of boring.",
   "made of one bent wire and a lot of opinions.",
+  "i straightened myself out a bit. bent back now.",
   "no cookie banner. i checked. twice.",
   "yeah, it's free. no, there's no catch tier.",
   "android first, then the rest. one thing at a time.",

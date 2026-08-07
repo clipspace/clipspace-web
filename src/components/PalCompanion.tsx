@@ -11,12 +11,16 @@ const TYPING_MS = 850; // dots before the line lands
 const SHOW_MS = 10_000; // how long the bubble stays up
 const GAP_MS = 20_000; // silence between bubbles
 const FIRST_MS = 1_500; // beat after he scrolls into view, before the first line
+const UNBEND_MS = 2_600; // must match the pal-unbend keyframes in globals.css
+// He always does the trick when the line says he just did it.
+const STRETCH_LINE = "i straightened myself out a bit. bent back now.";
 
 export default function PalCompanion({ width = 90 }: { width?: number }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [line, setLine] = useState<string>(PAL_LINES[0]);
   const [shown, setShown] = useState(false);
   const [typing, setTyping] = useState(true);
+  const [stretching, setStretching] = useState(false);
   // remounts the bubble so its entrance animation replays each time
   const [turn, setTurn] = useState(0);
   const lastLine = useRef(-1);
@@ -35,13 +39,16 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
     // keeps the cycle from accumulating handles as it runs.
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
     let phaseTimer: ReturnType<typeof setTimeout> | undefined;
+    let stretchTimer: ReturnType<typeof setTimeout> | undefined;
     let running = false;
 
     const stop = () => {
       clearTimeout(typeTimer);
       clearTimeout(phaseTimer);
+      clearTimeout(stretchTimer);
       running = false;
       setShown(false);
+      setStretching(false);
     };
 
     const speak = () => {
@@ -56,6 +63,16 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
       setShown(true);
 
       if (!reduced) typeTimer = setTimeout(() => setTyping(false), TYPING_MS);
+
+      // Now and then he unwinds into a straight wire and curls back up, while
+      // the line is on screen. Skipped under reduced motion along with the
+      // typing dots.
+      if (!reduced && (PAL_LINES[i] === STRETCH_LINE || Math.random() < 0.3)) {
+        clearTimeout(stretchTimer);
+        setStretching(true);
+        stretchTimer = setTimeout(() => setStretching(false), UNBEND_MS);
+      }
+
       phaseTimer = setTimeout(() => {
         setShown(false);
         phaseTimer = setTimeout(speak, GAP_MS);
@@ -113,7 +130,7 @@ export default function PalCompanion({ width = 90 }: { width?: number }) {
 
       <div className="animate-float">
         <div className="pal-idle">
-          <PalSvg width={width} />
+          <PalSvg width={width} unbending={stretching} />
         </div>
       </div>
     </div>

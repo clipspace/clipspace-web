@@ -168,6 +168,25 @@ const MIN_PAL_W = 46; // below this he's too small to read; hide him instead
 const GAP = 12; // clearance between the pal and the content column
 const EDGE = 8; // clearance from the screen edge
 
+// How fast he moves, in pixels per SECOND — deliberately not per frame. A
+// per-frame step covers twice the ground on a 120Hz screen as it does on a
+// 60Hz one, so the same walk reads as a sprint depending on the display (and
+// on whatever else the browser is doing). These numbers are the old per-frame
+// values converted at 60Hz, so the pace is unchanged on a 60Hz screen and
+// finally the same everywhere else.
+const SPEED_X = 480; // was 8px/frame
+const SPEED_Y = 540; // was 9px/frame — he claws back ground during fast scrolls
+// Exponential ease toward the target, expressed as a rate rather than a
+// per-frame fraction: 1 - e^(-EASE/60) ≈ 0.1, the old pull.
+const EASE = 6.32;
+const LEAN_EASE = 7.67; // likewise, ≈0.12 per frame at 60Hz
+const WALK_SPEED = 27; // px/s above which he counts as walking (was 0.45/frame)
+const FACE_SPEED = 36; // px/s above which he turns to face his direction
+const RETARGET_MS = 330; // how often to re-measure the anchors
+const UNBEND_MS = 2600; // must match the pal-unbend keyframes in globals.css
+// He is guaranteed to do the trick when he has just claimed he did it.
+const STRETCH_LINE = "i straightened myself out a bit. bent back now.";
+
 export default function ScrollPal() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const palRef = useRef<HTMLDivElement>(null);
@@ -177,6 +196,7 @@ export default function ScrollPal() {
   const [typing, setTyping] = useState(true);
   const [arrivalId, setArrivalId] = useState(0);
   const [walking, setWalking] = useState(false);
+  const [stretching, setStretching] = useState(false);
   const [palW, setPalW] = useState(88);
   const [bubbleW, setBubbleW] = useState(240);
   const [bubSize, setBubSize] = useState<{ w: number; h: number } | null>(null);
@@ -357,10 +377,17 @@ export default function ScrollPal() {
     let wasWalking = false;
     let shownStop: string | null = null; // stop whose line the bubble shows
     let typeTimer: ReturnType<typeof setTimeout> | undefined;
-    let frame = 0;
+    let stretchTimer: ReturnType<typeof setTimeout> | undefined;
+    let last = performance.now();
+    let lastRetarget = 0;
 
-    const loop = () => {
+    const loop = (now: number) => {
       const c = cur.current;
+      // Seconds since the previous frame, floored at 20fps: coming back to a
+      // backgrounded tab hands us one enormous gap, and without the clamp he
+      // would teleport across the screen on the first frame back.
+      const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
+      last = now;
 
       // being dragged: he goes exactly where the pointer puts him, and his
       // target follows so he doesn't snap back the instant he's released
@@ -377,38 +404,42 @@ export default function ScrollPal() {
       // re-measure a few times a second: reveal animations and layout
       // shifts move the anchors without firing a scroll event. Skipped while
       // he's been dropped somewhere, so he stays put until the next scroll.
-      if (++frame % 20 === 0 && !idle.current && !dropped.current) computeTarget();
+      if (now - lastRetarget > RETARGET_MS) {
+        lastRetarget = now;
+        if (!idle.current && !dropped.current) computeTarget();
+      }
+
+      // Ease toward the target, then cap the result — so he sets off at a
+      // steady walk and slows down as he arrives, at the same pace on any
+      // refresh rate. Velocities are px/s; multiplying by dt gives the step.
+      const ease = 1 - Math.exp(-EASE * dt);
       const dx = target.current.x - c.x;
-      // gentle ease with a speed cap so crossing the screen reads as a brisk
-      // walk — 11 was a sprint, 5.5 was a crawl
-      let step = dx * 0.1;
-      const MAX = 8;
-      if (step > MAX) step = MAX;
-      if (step < -MAX) step = -MAX;
-      if (Math.abs(dx) > 0.4) c.x += step;
-      // capped vertical follow: he lags a touch behind fast scrolls and
+      let vx = (dx * ease) / dt;
+      if (vx > SPEED_X) vx = SPEED_X;
+      if (vx < -SPEED_X) vx = -SPEED_X;
+      if (Math.abs(dx) > 0.4) c.x += vx * dt;
+      // vertical follow is a touch quicker: he lags behind fast scrolls and
       // catches up, like he's actually running after his anchor
-      let stepY = (target.current.y - c.y) * 0.1;
-      // barely above the horizontal cap: enough to still claw back ground
-      // during a fast scroll, but close enough that his vertical and
-      // horizontal movement read as the same creature at the same pace
-      const MAXY = 9;
-      if (stepY > MAXY) stepY = MAXY;
-      if (stepY < -MAXY) stepY = -MAXY;
-      c.y += stepY;
+      let vy = ((target.current.y - c.y) * ease) / dt;
+      if (vy > SPEED_Y) vy = SPEED_Y;
+      if (vy < -SPEED_Y) vy = -SPEED_Y;
+      c.y += vy * dt;
 
       // lean into the stride, straighten out when idle
-      const leanTarget = Math.max(-9, Math.min(9, step * 1.6));
-      c.lean += (leanTarget - c.lean) * 0.12;
-      if (Math.abs(step) > 0.6) c.facing = step > 0 ? 1 : -1;
+      const leanTarget = Math.max(-9, Math.min(9, (vx / SPEED_X) * 12.8));
+      c.lean += (leanTarget - c.lean) * (1 - Math.exp(-LEAN_EASE * dt));
+      if (Math.abs(vx) > FACE_SPEED) c.facing = vx > 0 ? 1 : -1;
 
-      const isWalking = Math.abs(step) > 0.45;
+      const isWalking = Math.abs(vx) > WALK_SPEED;
       if (isWalking !== wasWalking) {
         wasWalking = isWalking;
         setWalking(isWalking);
         if (isWalking) {
-          // he sets off — put the bubble away until he arrives
+          // he sets off — put the bubble away until he arrives, and drop the
+          // stretch: you can't unwind yourself and walk at the same time
           clearTimeout(typeTimer);
+          clearTimeout(stretchTimer);
+          setStretching(false);
           setBubbleOn(false);
           shownStop = null;
         }
@@ -431,6 +462,16 @@ export default function ScrollPal() {
         setBubSize(null); // fresh bubble starts at the dots' natural size
         setArrivalId((n) => n + 1);
         typeTimer = setTimeout(() => setTyping(false), 850);
+
+        // Standing still is when he can afford to unwind. Rare enough at a
+        // normal stop that catching it feels like a find, more likely while
+        // he's idling, and certain when the line says he just did it.
+        const odds = s.id === IDLE_STOP.id ? 0.4 : 0.18;
+        if (s.lines[i] === STRETCH_LINE || Math.random() < odds) {
+          clearTimeout(stretchTimer);
+          setStretching(true);
+          stretchTimer = setTimeout(() => setStretching(false), UNBEND_MS);
+        }
       }
 
       if (wrapRef.current) {
@@ -466,6 +507,7 @@ export default function ScrollPal() {
       cancelAnimationFrame(raf);
       clearTimeout(typeTimer);
       clearTimeout(idleTimer);
+      clearTimeout(stretchTimer);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", computeTarget);
       window.removeEventListener("mousemove", activity);
@@ -587,7 +629,7 @@ export default function ScrollPal() {
           }`}
         >
           <div className={walking ? "pal-walk" : "pal-idle"}>
-            <PalSvg width={palW} walking={walking} />
+            <PalSvg width={palW} walking={walking} unbending={stretching} />
           </div>
         </div>
       </div>

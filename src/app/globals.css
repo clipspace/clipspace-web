@@ -171,6 +171,44 @@ html { font-size: 14.4px; }
   transform-origin: 50% 90%;
 }
 
+/* Standing around, he sometimes unwinds into a straight piece of wire and
+   curls back into a paperclip. Both paths keep the same command sequence as
+   the shapes in PalSvg — that is what lets the browser interpolate between
+   them instead of cutting. Browsers without CSS `d` just ignore this and he
+   stays a paperclip, which is a fine thing to fall back to. */
+@keyframes pal-unbend {
+  0%, 100% {
+    d: path("M15 62 L15 14 C15 7 19 3 25 3 C31 3 35 7 35 14 L35 50 C35 55 32 58 28 58 C24 58 21 55 21 50 L21 20");
+  }
+  38%, 58% {
+    d: path("M25 78 L25 56.3 C25 53.9 25 51.5 25 49.1 C25 46.7 25 44.2 25 41.8 L25 25.6 C25 24 25 22.3 25 20.6 C25 18.9 25 17.3 25 15.6 L25 2.1");
+  }
+}
+/* the leg unwinds too, collapsing onto the bottom end of the wire */
+@keyframes pal-unbend-leg {
+  0%, 100% {
+    d: path("M15 63 C15 70 20 73 27 73 C34 73 41 69 41 61 L41 54");
+  }
+  38%, 58% {
+    d: path("M25 78 C25 78 25 78 25 78 C25 78 25 78 25 78 L25 78");
+  }
+}
+/* no face while he's a bare wire — there is nowhere for the eyes to sit */
+@keyframes pal-unbend-eyes {
+  0%, 20% { opacity: 1; }
+  33%, 63% { opacity: 0; }
+  76%, 100% { opacity: 1; }
+}
+.pal-unbending .pal-body {
+  animation: pal-unbend 2.6s ease-in-out both;
+}
+.pal-unbending .pal-leg {
+  animation: pal-unbend-leg 2.6s ease-in-out both;
+}
+.pal-unbending .pal-eye {
+  animation: pal-unbend-eyes 2.6s ease-in-out both;
+}
+
 /* speech bubble pops in whenever he says something new */
 @keyframes pal-say {
   0% { opacity: 0; transform: scale(0.55); }
