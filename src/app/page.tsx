@@ -1,10 +1,10 @@
 import { Logo } from "@/components/Logo";
 import ChatDemo from "@/components/ChatDemo";
-import PalSvg from "@/components/PalSvg";
 // Every one of the pal's stops is anchored to an element on this page, so he
 // lives here rather than in the root layout — other routes have nothing for
 // him to point at.
 import ScrollPal from "@/components/ScrollPal";
+import PalCompanion from "@/components/PalCompanion";
 
 /* ---------- small building blocks ---------- */
 
@@ -286,11 +286,7 @@ export default function Home() {
           {/* the clip pal keeps you company here up to 1600px; on wide
               desktops the walking guide passes through instead */}
           <div className="mx-auto md:mx-0 min-[1600px]:hidden" data-reveal>
-            <div className="animate-float">
-              <div className="pal-idle">
-                <PalSvg width={90} />
-              </div>
-            </div>
+            <PalCompanion width={90} />
           </div>
           <div data-reveal>
             <h2 id="pal-why-anchor" className="font-display text-3xl font-bold md:text-4xl">
