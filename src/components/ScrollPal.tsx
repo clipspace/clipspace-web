@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import type { PalLine } from "@/lib/pal-lines";
+import { REDUCED_MOTION, useMediaQuery } from "@/lib/use-media-query";
 import PalSvg, {
   isPose,
   PAL_GESTURES,
@@ -196,6 +197,11 @@ const IDLE_ENTER_MS = 12000; // stillness before he wanders off
 // reads as resting, instead of pacing across the screen every few seconds
 const IDLE_WANDER_MS = 20000;
 
+// The breakpoint the wrapper's `min-[1600px]:block` uses. Below it he is
+// display:none and the static PalCompanion takes over, so the walk has to be
+// switched off rather than merely hidden — see the effect below.
+const WIDE = "(min-width: 1600px)";
+
 const MIN_PAL_W = 46; // below this he's too small to read; hide him instead
 const GAP = 12; // clearance between the pal and the content column
 const EDGE = 8; // clearance from the screen edge
@@ -258,6 +264,15 @@ export default function ScrollPal() {
   // the line last played at each stop, so a random pick can avoid repeating it
   const lineIdx = useRef<Record<string, number>>({});
 
+  // He is rendered on every page load but only *shown* on wide screens. Below
+  // the breakpoint the animation below used to keep running anyway: a
+  // requestAnimationFrame loop writing a transform 60 times a second, plus
+  // six window listeners and a re-measure of five anchors three times a
+  // second — all of it for a display:none element, on every phone that opens
+  // the page. Both queries gate the effect instead.
+  const wide = useMediaQuery(WIDE);
+  const reduced = useMediaQuery(REDUCED_MOTION);
+
   // measure the bubble's content so the box itself can smoothly grow from
   // the little typing bubble into the full line (width/height transition)
   useLayoutEffect(() => {
@@ -267,7 +282,7 @@ export default function ScrollPal() {
   }, [typing, line, bubbleW, palW, arrivalId]);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!wide || reduced) return;
 
     // The content column's width lives in --content-w (globals.css) and both
     // it and the root font size change across breakpoints, so read them each
@@ -580,7 +595,7 @@ export default function ScrollPal() {
       window.removeEventListener("touchstart", activity);
       window.removeEventListener("wheel", activity);
     };
-  }, []);
+  }, [wide, reduced]);
 
   // Drag handlers live outside the animation effect because they only touch
   // refs the loop already reads. Pointer capture means a fast drag can't

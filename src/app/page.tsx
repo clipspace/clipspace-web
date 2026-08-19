@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import ChatDemo from "@/components/ChatDemo";
 // Every one of the pal's stops is anchored to an element on this page, so he
@@ -444,7 +445,7 @@ export default function Home() {
             © 2026 ClipSpace · made with 🖇️ and stubbornness
           </p>
           <p className="text-xs text-muted">
-            <a href="/privacy" className="hover:text-brass hover:underline">Privacy</a>
+            <Link href="/privacy" className="hover:text-brass hover:underline">Privacy</Link>
             {" · "}
             <a href="https://github.com/clipspace/clipspace-web" className="hover:text-brass hover:underline">GitHub</a>
             {" · "}

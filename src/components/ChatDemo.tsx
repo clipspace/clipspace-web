@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { REDUCED_MOTION, useMediaQuery } from "@/lib/use-media-query";
 
 type Msg = { who: "them" | "me"; text: string };
 
@@ -46,6 +47,10 @@ const SCRIPTS = [CLASSIC, GENZ];
 const WINDOW = 4;
 const PLACEHOLDER = "Message bro…";
 
+// What the card shows when the visitor has asked for reduced motion: the
+// opening exchange, standing still. It never changes, so it is built once.
+const STILL = CLASSIC.slice(0, 3).map((m, i) => ({ m, key: i }));
+
 function Bubble({ who, children }: { who: "them" | "me"; children: React.ReactNode }) {
   return (
     <div className={`flex ${who === "me" ? "justify-end" : "justify-start"}`}>
@@ -74,6 +79,7 @@ export default function ChatDemo() {
   const scriptRef = useRef(0); // which script (0 = classic, 1 = gen-z)
   const nextKey = useRef(2);
   const inputRef = useRef<HTMLDivElement>(null);
+  const reduced = useMediaQuery(REDUCED_MOTION);
 
   // Keep the caret end in view as text is typed, like a real phone input
   // scrolling left — no ellipsis, no truncation.
@@ -83,17 +89,17 @@ export default function ChatDemo() {
   }, [inputText]);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setShown(CLASSIC.slice(0, 3).map((m, i) => ({ m, key: i })));
-      return;
-    }
+    if (reduced) return;
 
     let cancelled = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    // `run` is one sequential loop, so exactly one wait is ever outstanding —
+    // a single handle is all the cleanup needs. Collecting them in a list
+    // instead kept every timer of the session alive for as long as the tab
+    // was open.
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const wait = (ms: number) =>
       new Promise<void>((res) => {
-        const t = setTimeout(res, ms);
-        timers.push(t);
+        timer = setTimeout(res, ms);
       });
 
     const push = (m: Msg) => {
@@ -141,19 +147,19 @@ export default function ChatDemo() {
     run();
     return () => {
       cancelled = true;
-      timers.forEach(clearTimeout);
+      clearTimeout(timer);
     };
-  }, []);
+  }, [reduced]);
 
   return (
     <>
       <div className="flex h-[224px] flex-col justify-end gap-3 overflow-hidden py-5">
-        {shown.map(({ m, key }) => (
+        {(reduced ? STILL : shown).map(({ m, key }) => (
           <Bubble key={key} who={m.who}>
             {m.text}
           </Bubble>
         ))}
-        {themTyping ? (
+        {themTyping && !reduced ? (
           <div className="flex justify-start">
             <div className="msg-in flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-surface-2 px-4 py-3">
               <span className="dot-blink h-2 w-2 rounded-full bg-muted" />
@@ -169,7 +175,7 @@ export default function ChatDemo() {
           ref={inputRef}
           className="min-w-0 flex-1 overflow-hidden whitespace-nowrap rounded-full border border-line px-4 py-2.5 text-sm"
         >
-          {inputText ? (
+          {inputText && !reduced ? (
             <span className="text-cream">
               {inputText}
               <span className="type-caret text-brass">|</span>
