@@ -25,6 +25,13 @@ export const structuredData = {
         url: "https://jachym.djt-group.com",
       },
       sameAs: ["https://github.com/clipspace"],
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "clipspace@djt-group.com",
+        url: `${SITE}/#feedback`,
+        availableLanguage: ["en", "cs"],
+      },
     },
     {
       "@type": "WebSite",

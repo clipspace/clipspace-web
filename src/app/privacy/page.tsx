@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 
 const TITLE = "privacy policy – ClipSpace";
 const DESCRIPTION =
-  "How the ClipSpace website handles your data: no cookies, no ad trackers, no accounts. Just hosting logs and cookieless, aggregate analytics.";
+  "How the ClipSpace website handles your data: no cookies, no ad trackers, no accounts. Just hosting logs, cookieless aggregate analytics, and the feedback form if you use it.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -16,9 +16,17 @@ export const metadata: Metadata = {
   twitter: { title: TITLE, description: DESCRIPTION },
 };
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  id,
+  children,
+}: {
+  title: string;
+  id?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <section className="mt-10">
+    <section className="mt-10 scroll-mt-8" id={id}>
       <h2 className="font-display text-xl font-bold">{title}</h2>
       <div className="mt-3 space-y-3 leading-relaxed text-muted">{children}</div>
     </section>
@@ -39,16 +47,18 @@ export default function Privacy() {
 
       <article className="mx-auto max-w-3xl px-6 pb-24 pt-8">
         <h1 className="font-display text-4xl font-bold">Privacy policy</h1>
-        <p className="mt-3 text-sm text-muted">Last updated: 7 August 2026</p>
+        <p className="mt-3 text-sm text-muted">Last updated: 11 September 2026</p>
 
         <div className="mt-8 rounded-xl border border-brass/40 bg-surface p-5 leading-relaxed">
           <p className="font-display font-bold text-brass">The short version</p>
           <p className="mt-2 text-muted">
             This website sets <strong className="text-cream">no cookies</strong>,
             embeds <strong className="text-cream">no ad trackers</strong>, and has
-            no accounts or forms. We use privacy-friendly, cookieless analytics that
-            counts visits in aggregate and never identifies you – so there is
-            nothing about you to sell, and no reason for a cookie banner.
+            no accounts. We use privacy-friendly, cookieless analytics that counts
+            visits in aggregate and never identifies you – so there is nothing about
+            you to sell, and no reason for a cookie banner. The one thing you can
+            hand us is a message through the feedback form, and that goes to a
+            mailbox, not a database.
           </p>
         </div>
 
@@ -94,6 +104,51 @@ export default function Privacy() {
           </p>
         </Section>
 
+        <Section title="The feedback form" id="feedback">
+          <p>
+            The homepage has a feedback form. Using it is entirely optional. When
+            you send it, we receive what you typed: your message, and – only if you
+            chose to fill them in – your name and email address. The form also
+            notes which section of the page you sent it from, so we know what you
+            are talking about.
+          </p>
+          <p>
+            The message is delivered as an ordinary email to{" "}
+            <a href="mailto:clipspace@djt-group.com" className="text-brass hover:underline">
+              clipspace@djt-group.com
+            </a>{" "}
+            through{" "}
+            <a
+              href="https://resend.com/legal/privacy-policy"
+              className="text-brass hover:underline"
+              rel="noopener noreferrer"
+            >
+              Resend Inc.
+            </a>{" "}
+            (our data processor for email, based in the United States; transfers
+            are covered by its{" "}
+            <a
+              href="https://resend.com/legal/dpa"
+              className="text-brass hover:underline"
+              rel="noopener noreferrer"
+            >
+              data processing agreement
+            </a>{" "}
+            with standard contractual clauses). If you left an email address, you
+            also get one automatic confirmation from us and we may reply to you
+            there. Nothing from the form is stored in a database or shared with
+            anyone else; we keep the email until your message is dealt with, then
+            delete it.
+          </p>
+          <p>
+            The legal basis is Art. 6(1)(b) GDPR – answering the request you sent
+            us – and, for keeping the form from being abused, our legitimate
+            interest (Art. 6(1)(f)): the server counts recent submissions per IP
+            address in memory for a few minutes and rejects floods. Those counters
+            are never written anywhere.
+          </p>
+        </Section>
+
         <Section title="Where your data goes">
           <p>
             Vercel Inc. is based in the United States, so serving this site can
@@ -111,9 +166,11 @@ export default function Privacy() {
             from Vercel&apos;s Frankfurt region.
           </p>
           <p>
-            No other company receives your data. We use no advertising networks, no
-            content delivery networks of our own, and no third-party embeds – every
-            font, script and image on this site is served from this domain.
+            Apart from Resend, which only ever sees what you send through the
+            feedback form, no other company receives your data. We use no
+            advertising networks, no content delivery networks of our own, and no
+            third-party embeds – every font, script and image on this site is
+            served from this domain.
           </p>
         </Section>
 
@@ -146,8 +203,8 @@ export default function Privacy() {
             </li>
             <li>No Google Analytics, no advertising, no social media pixels.</li>
             <li>
-              No accounts, no forms, no newsletter – there is nothing here for you
-              to fill in, so you never hand us anything directly.
+              No accounts, no newsletter, no sign-up of any kind. The only thing you
+              can fill in is the feedback form, and only if you want to.
             </li>
             <li>
               No fingerprinting, no cross-site tracking, no profiles, and no
