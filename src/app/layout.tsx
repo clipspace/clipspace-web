@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import ScrollReveal from "@/components/ScrollReveal";
+import "clip-pal/styles.css";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({

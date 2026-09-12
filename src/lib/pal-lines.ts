@@ -1,11 +1,4 @@
-import type { PalEmote } from "@/components/PalSvg";
-
-// A line and the trick that goes with it. Pairing them here rather than in a
-// lookup table is deliberate: an emote is part of how a line reads, so the two
-// have to be written together and can never drift apart. A question turns him
-// into a question mark, "no ads, no tracking" gets a head shake, and anything
-// about jumping makes him jump.
-export type PalLine = readonly [text: string, emote: PalEmote];
+import type { PalLine } from "clip-pal";
 
 // Lines for the standing pal in the "why" section — the one that shows on
 // phones and narrower desktops, where the walking guide never appears.
@@ -52,4 +45,10 @@ export const PAL_LINES: readonly PalLine[] = [
   ["give it a boot and it still works. sturdy, this.", "kick"],
   ["oops. that'll buff out, probably.", "crack"],
   ["...i'll pay for the screen. put it on my tab.", "crack"],
+  ["your keys, your lock, your call. i can do the shape.", "key"],
+  ["oh! a visitor. i wasn't ready. i'm ready now.", "exclaim"],
+  ["one-legged backflip. don't tell my insurer.", "backflip"],
+  ["brr. i read a data broker's terms once. still cold.", "shiver"],
+  ["…zzz. oh. you're back. i wasn't asleep.", "doze"],
+  ["thank you, thank you. no autographs, i'm made of wire.", "bow"],
 ] as const;

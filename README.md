@@ -23,7 +23,13 @@ itself is a work in progress — star the repo to follow the build.
 
 Built with [Next.js](https://nextjs.org), Tailwind CSS and TypeScript.
 Featuring a one-legged paperclip pal who walks along as you scroll and
-keeps you company. He means well.
+keeps you company. He means well — and he is a package of his own:
+[`clip-pal`](https://www.npmjs.com/package/clip-pal)
+([source](https://github.com/clipspace/clip-pal)), so you can put him on
+your site too.
+
+The homepage also has a feedback form. It needs `RESEND_API_KEY` (see
+`.env.example`); without it the form tells visitors to email instead.
 
 ### Run it locally
 

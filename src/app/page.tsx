@@ -5,8 +5,10 @@ import ChatDemo from "@/components/ChatDemo";
 // Every one of the pal's stops is anchored to an element on this page, so he
 // lives here rather than in the root layout — other routes have nothing for
 // him to point at.
-import ScrollPal from "@/components/ScrollPal";
-import PalCompanion from "@/components/PalCompanion";
+import { PalCompanion, ScrollPal } from "clip-pal";
+import { PAL_LINES } from "@/lib/pal-lines";
+import { IDLE_LINES, STOPS } from "@/lib/pal-stops";
+import FeedbackForm from "@/components/FeedbackForm";
 import { structuredData } from "@/lib/structured-data";
 
 // The same page is reachable on several hosts (the custom domain plus the
@@ -74,14 +76,23 @@ function FeatureIcon({ kind }: { kind: string }) {
 function Feature({
   icon,
   title,
+  say,
+  emote,
   children,
 }: {
   icon: string;
   title: string;
+  /** what the pal says when the card is hovered */
+  say: string;
+  emote: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-line bg-surface p-6 transition-colors hover:border-brass/40">
+    <div
+      className="rounded-xl border border-line bg-surface p-6 transition-colors hover:border-brass/40"
+      data-pal-say={say}
+      data-pal-emote={emote}
+    >
       <FeatureIcon kind={icon} />
       <h3 className="font-display mt-4 text-lg font-bold">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted">{children}</p>
@@ -117,12 +128,17 @@ function Clipping({
   source,
   title,
   tiltDeg,
+  say,
+  emote,
 }: {
   href: string;
   source: string;
   title: React.ReactNode;
   /** Card tilt. Positive rotates clockwise, which lifts the left edge. */
   tiltDeg: number;
+  /** what the pal says when the clipping is hovered */
+  say: string;
+  emote: string;
 }) {
   // A single clip goes on whichever corner the tilt has raised — a clip on the
   // low side would read as sliding off. Deriving it from the angle keeps the
@@ -152,6 +168,8 @@ function Clipping({
       }
       /* pt only has to clear the part of the clip that overlaps the card */
       className="relative block rounded-lg border border-line bg-surface-2 px-5 pb-4 pt-6 shadow-lg transition-all [rotate:var(--tilt)] hover:border-brass/40 hover:[rotate:0deg]"
+      data-pal-say={say}
+      data-pal-emote={emote}
     >
       {/* Roughly half the clip sits above the edge and half grips the card —
           hang it higher and it stops looking attached to anything. */}
@@ -189,10 +207,13 @@ export default function Home() {
           <a href="#features" className="transition-colors hover:text-cream">Features</a>
           <a href="#why" className="transition-colors hover:text-cream">Why</a>
           <a href="#opensource" className="transition-colors hover:text-cream">Open source</a>
+          <a href="#feedback" className="transition-colors hover:text-cream">Feedback</a>
         </nav>
         <a
           href="https://github.com/clipspace/clipspace-web"
           className="rounded-full border border-line px-4 py-2 text-sm text-cream transition-colors hover:border-brass hover:text-brass"
+          data-pal-say="go on, star it. i count them."
+          data-pal-emote="wave"
         >
           GitHub ↗
         </a>
@@ -239,7 +260,11 @@ export default function Home() {
 
           {/* mock chat card */}
           <div data-reveal className="min-w-0">
-            <div className="animate-float rounded-2xl border border-line bg-surface p-5">
+            <div
+              className="animate-float rounded-2xl border border-line bg-surface p-5"
+              data-pal-say="that's bro. nice guy. i can't read what he's saying either."
+              data-pal-emote="look"
+            >
               <div className="flex items-center justify-between border-b border-line pb-4">
                 <div className="flex items-center gap-3">
                   <div className="font-display flex h-8 w-8 items-center justify-center rounded-full border border-brass/40 bg-brass/15 text-sm font-bold text-brass">
@@ -270,27 +295,27 @@ export default function Home() {
           </span>
         </h2>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-reveal-stagger>
-          <Feature icon="lock" title="End-to-end encrypted">
+          <Feature icon="lock" title="End-to-end encrypted" say="encrypted on your phone. not even i can read it. i checked." emote="key">
             Every message, post and photo is encrypted on your device. Your keys
             never leave your pocket, so nobody in between can read a thing.
           </Feature>
-          <Feature icon="code" title="100% open source">
+          <Feature icon="code" title="100% open source" say="every line is public. even the embarrassing ones." emote="unbend">
             All of it: clients, server, crypto. You don&apos;t have to trust
             us. Read the code, or find someone who did.
           </Feature>
-          <Feature icon="free" title="Free forever">
+          <Feature icon="free" title="Free forever" say="free. as in no card, no tier, no catch." emote="nod">
             No ads, no premium tiers for privacy, no selling your attention.
             Privacy is the default, not a subscription.
           </Feature>
-          <Feature icon="spaces" title="Spaces, not feeds">
+          <Feature icon="spaces" title="Spaces, not feeds" say="small rooms, real people. no firehose." emote="heart">
             Small circles of real people instead of an algorithmic firehose.
             You choose who&apos;s in your space and what you see.
           </Feature>
-          <Feature icon="home" title="Self-hostable">
+          <Feature icon="home" title="Self-hostable" say="run it on your own box. i'll move in." emote="hop">
             Run your own server for your friends, family or community, or
             just join one you trust. Your data lives where you say.
           </Feature>
-          <Feature icon="nophone" title="No phone number">
+          <Feature icon="nophone" title="No phone number" say="no number, no real name. be whoever." emote="question">
             Sign up without a phone number or real name. Who you are on
             ClipSpace is up to you.
           </Feature>
@@ -303,7 +328,7 @@ export default function Home() {
           {/* the clip pal keeps you company here up to 1600px; on wide
               desktops the walking guide passes through instead */}
           <div className="mx-auto md:mx-0 min-[1600px]:hidden" data-reveal>
-            <PalCompanion width={90} />
+            <PalCompanion width={90} lines={PAL_LINES} />
           </div>
           <div data-reveal>
             <h2 id="pal-why-anchor" className="font-display text-3xl font-bold md:text-4xl">
@@ -337,18 +362,24 @@ export default function Home() {
                 href="https://jacobin.com/2025/10/internet-enshittification-antitrust-tech-doctorow"
                 source="Jacobin"
                 tiltDeg={-1}
+                say="enshittification. their word, not mine. accurate though."
+                emote="shake"
                 title={<>How to save the internet from &ldquo;enshittification&rdquo;</>}
               />
               <Clipping
                 href="https://www.vice.com/en/article/targeted-advertising-is-ruining-the-internet-and-breaking-the-world/"
                 source="VICE"
                 tiltDeg={1.2}
+                say="targeted ads. they target. we don't. that's the whole difference."
+                emote="look"
                 title="Targeted advertising is ruining the internet and breaking the world"
               />
               <Clipping
                 href="https://privacyinternational.org/long-read/2967/ad-supported-internet-broken-inefficient-and-privacy-nightmare-lets-fix-it"
                 source="Privacy International"
                 tiltDeg={-0.6}
+                say="i hold these up so you don't have to take our word for it."
+                emote="lean"
                 title="The ad-supported internet is broken, inefficient and a privacy nightmare"
               />
             </div>
@@ -372,11 +403,56 @@ export default function Home() {
             <a
               href="https://github.com/clipspace/clipspace-web"
               className="font-display mt-8 inline-block rounded-full border border-line px-6 py-3 font-bold transition-colors hover:border-brass hover:text-brass"
+              data-pal-say="stars keep the lights on. metaphorically. we have no lights."
+              data-pal-emote="bow"
             >
               Star on GitHub ↗
             </a>
+            {/* the mascot is a package of his own — the first thing from
+                this project anyone can actually install */}
+            <div
+              className="mt-10 rounded-xl border border-line bg-surface p-5"
+              data-pal-say="that's me. i'm on npm. very portable, very bendy."
+              data-pal-emote="backflip"
+            >
+              <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-brass">
+                take clip pal with you
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                The paperclip walking around this page is an open-source React
+                component. Drop him on your own site — every emote, the
+                speech bubble, the scroll-along walk.
+              </p>
+              <p className="mt-3 font-mono text-sm">
+                <span className="text-brass">$</span> npm i clip-pal
+              </p>
+              <p className="mt-3 text-xs text-muted">
+                <a
+                  href="https://www.npmjs.com/package/clip-pal"
+                  rel="noopener noreferrer"
+                  className="hover:text-brass hover:underline"
+                >
+                  npm ↗
+                </a>
+                {" · "}
+                <a
+                  href="https://github.com/clipspace/clip-pal"
+                  rel="noopener noreferrer"
+                  className="hover:text-brass hover:underline"
+                >
+                  GitHub ↗
+                </a>
+                {" · "}MIT
+              </p>
+            </div>
           </div>
-          <div id="pal-open-anchor" className="rounded-xl border border-line bg-surface p-6 font-mono text-sm leading-relaxed" data-reveal>
+          <div
+            id="pal-open-anchor"
+            className="rounded-xl border border-line bg-surface p-6 font-mono text-sm leading-relaxed"
+            data-reveal
+            data-pal-say="make freedom. best makefile target ever written."
+            data-pal-emote="spin"
+          >
             <p className="text-muted"># coming soon</p>
             <p className="mt-2">
               <span className="text-brass">$</span> git clone
@@ -404,7 +480,11 @@ export default function Home() {
             <span id="pal-news-anchor">What&apos;s new?</span>
           </h2>
           <div className="mt-10 grid gap-5 md:grid-cols-2" data-reveal-stagger>
-            <div className="rounded-xl border border-line bg-bg p-6">
+            <div
+              className="rounded-xl border border-line bg-bg p-6"
+              data-pal-say="android first. it's where the wire's being bent right now."
+              data-pal-emote="hop"
+            >
               <span className="rounded-full border border-brass/40 px-2.5 py-1 text-xs font-medium text-brass">
                 in progress
               </span>
@@ -417,7 +497,11 @@ export default function Home() {
                 version of the server alongside it.
               </p>
             </div>
-            <div className="rounded-xl border border-line bg-bg p-6">
+            <div
+              className="rounded-xl border border-line bg-bg p-6"
+              data-pal-say="the rest comes later. one thing at a time, we're a small wire."
+              data-pal-emote="nod"
+            >
               <span className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-muted">
                 planned
               </span>
@@ -430,6 +514,33 @@ export default function Home() {
                 and Linux. But right now, Android is the one on its way.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* feedback */}
+      <section id="feedback" className="mx-auto content-col px-6 py-20">
+        <div className="grid items-start gap-12 md:grid-cols-[1fr_1.4fr]">
+          <div data-reveal>
+            <h2 className="font-display text-3xl font-bold md:text-4xl">
+              <span id="pal-feedback-anchor">Tell us what you think.</span>
+            </h2>
+            <p className="mt-5 leading-relaxed text-muted">
+              Found a bug on this page? Have an opinion about how a social
+              network should work? Want to tell us the paperclip is creepy?
+              Type it in. It lands in a mailbox, a person reads it, and if
+              you leave an address, that person replies.
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-muted">
+              No account needed. Nothing is stored beyond the email itself.
+            </p>
+          </div>
+          <div
+            data-reveal
+            data-pal-say="type in there. i'll carry it over. carefully."
+            data-pal-emote="lean"
+          >
+            <FeedbackForm />
           </div>
         </div>
       </section>
@@ -449,6 +560,8 @@ export default function Home() {
             {" · "}
             <a href="https://github.com/clipspace/clipspace-web" className="hover:text-brass hover:underline">GitHub</a>
             {" · "}
+            <a href="https://www.npmjs.com/package/clip-pal" rel="noopener noreferrer" className="hover:text-brass hover:underline">clip-pal</a>
+            {" · "}
             <a
               href="https://jachym.djt-group.com"
               rel="noopener noreferrer"
@@ -462,7 +575,7 @@ export default function Home() {
         </div>
       </footer>
 
-      <ScrollPal />
+      <ScrollPal stops={STOPS} idleLines={IDLE_LINES} />
     </main>
   );
 }
