@@ -56,23 +56,23 @@ html {
 
 /* The scrollbar, in the desk-set colours: a brass thumb on the green
    ground. Firefox takes the two-colour shorthand; WebKit/Blink take the
-   pseudo-elements. Both kept thin so it reads as part of the page, not the
-   browser. */
+   pseudo-elements. Full width — it is meant to be seen and grabbed. */
 html {
-  scrollbar-color: color-mix(in srgb, var(--brass) 55%, transparent) var(--bg);
-  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--brass) 65%, transparent) var(--surface);
+  scrollbar-width: auto;
 }
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 16px;
+  height: 16px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: var(--surface);
 }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--brass) 55%, transparent);
-  border: 2px solid var(--bg);
+  background: color-mix(in srgb, var(--brass) 65%, transparent);
+  border: 3px solid var(--surface);
   border-radius: 999px;
+  min-height: 48px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brass);
