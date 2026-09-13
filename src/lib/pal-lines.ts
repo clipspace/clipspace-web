@@ -52,3 +52,14 @@ export const PAL_LINES: readonly PalLine[] = [
   ["…zzz. oh. you're back. i wasn't asleep.", "doze"],
   ["thank you, thank you. no autographs, i'm made of wire.", "bow"],
 ] as const;
+
+// What he says when a text field gets focus — the feedback form, mostly.
+// He is looking at it either way; these just admit it.
+export const WATCH_LINES: readonly PalLine[] = [
+  ["i'm not reading. okay, i'm reading a bit.", "look"],
+  ["go on, i won't judge. much.", "nod"],
+  ["ooh, typing. i love typing. i can't type.", "lean"],
+  ["take your time. spelling doesn't count.", "nod"],
+  ["is that about me? that's fine if it's about me.", "question"],
+  ["a human reads this, not a model. i just watch.", "look"],
+] as const;

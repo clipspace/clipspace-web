@@ -6,7 +6,7 @@ import ChatDemo from "@/components/ChatDemo";
 // lives here rather than in the root layout — other routes have nothing for
 // him to point at.
 import { PalCompanion, ScrollPal } from "clip-pal";
-import { PAL_LINES } from "@/lib/pal-lines";
+import { PAL_LINES, WATCH_LINES } from "@/lib/pal-lines";
 import { IDLE_LINES, STOPS } from "@/lib/pal-stops";
 import FeedbackForm from "@/components/FeedbackForm";
 import { structuredData } from "@/lib/structured-data";
@@ -328,7 +328,7 @@ export default function Home() {
           {/* the clip pal keeps you company here up to 1600px; on wide
               desktops the walking guide passes through instead */}
           <div className="mx-auto md:mx-0 min-[1600px]:hidden" data-reveal>
-            <PalCompanion width={90} lines={PAL_LINES} />
+            <PalCompanion width={90} lines={PAL_LINES} watchLines={WATCH_LINES} />
           </div>
           <div data-reveal>
             <h2 id="pal-why-anchor" className="font-display text-3xl font-bold md:text-4xl">
@@ -575,7 +575,7 @@ export default function Home() {
         </div>
       </footer>
 
-      <ScrollPal stops={STOPS} idleLines={IDLE_LINES} edge={30} />
+      <ScrollPal stops={STOPS} idleLines={IDLE_LINES} edge={30} watchLines={WATCH_LINES} />
     </main>
   );
 }
