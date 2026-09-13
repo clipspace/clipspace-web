@@ -58,21 +58,29 @@ html {
    ground. Firefox takes the two-colour shorthand; WebKit/Blink take the
    pseudo-elements. Full width — it is meant to be seen and grabbed. */
 html {
-  scrollbar-color: color-mix(in srgb, var(--brass) 65%, transparent) var(--surface);
+  scrollbar-color: color-mix(in srgb, var(--brass) 70%, transparent) var(--surface);
   scrollbar-width: auto;
+  /* always reserve the gutter, so the page never shifts when the bar
+     appears or an overlay scrollbar fades in and out */
+  scrollbar-gutter: stable;
 }
 ::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
 }
 ::-webkit-scrollbar-track {
   background: var(--surface);
 }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--brass) 65%, transparent);
-  border: 3px solid var(--surface);
+  background: color-mix(in srgb, var(--brass) 70%, transparent);
+  border: 5px solid var(--surface);
   border-radius: 999px;
-  min-height: 48px;
+  /* a long thumb even on the longest page, so it doesn't shrink to a nub */
+  min-height: 140px;
+}
+::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brass);
