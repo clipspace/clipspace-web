@@ -208,6 +208,15 @@ export default function Home() {
           <a href="#why" className="transition-colors hover:text-cream">Why</a>
           <a href="#opensource" className="transition-colors hover:text-cream">Open source</a>
           <a href="#feedback" className="transition-colors hover:text-cream">Feedback</a>
+          <a
+            href="https://www.npmjs.com/package/clip-pal"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-cream"
+            data-pal-say="that's my page. i'm on npm. i have a version number and everything."
+            data-pal-emote="bow"
+          >
+            clip-pal ↗
+          </a>
         </nav>
         <a
           href="https://github.com/clipspace/clipspace-web"
