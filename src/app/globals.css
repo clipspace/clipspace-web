@@ -54,33 +54,24 @@ html {
   scroll-behavior: smooth;
 }
 
-/* The scrollbar, in the desk-set colours: a brass thumb on the green
-   ground. Firefox takes the two-colour shorthand; WebKit/Blink take the
-   pseudo-elements. Full width — it is meant to be seen and grabbed. */
-html {
-  scrollbar-color: color-mix(in srgb, var(--brass) 70%, transparent) var(--surface);
-  scrollbar-width: auto;
-  /* always reserve the gutter, so the page never shifts when the bar
-     appears or an overlay scrollbar fades in and out */
-  scrollbar-gutter: stable;
-}
-::-webkit-scrollbar {
-  width: 22px;
-  height: 22px;
-}
-::-webkit-scrollbar-track {
-  background: var(--surface);
-}
-::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--brass) 70%, transparent);
-  border: 5px solid var(--surface);
-  border-radius: 999px;
-  /* a long thumb even on the longest page, so it doesn't shrink to a nub */
-  min-height: 140px;
-}
-::-webkit-scrollbar-button {
-  display: none;
-  height: 0;
+/* The page scrollbar is our own (components/ScrollBar.tsx) — the native
+   one is a different size in every browser and shrinks on hover under GTK.
+   Hide it from 768px up, where the rail takes over; phones keep theirs.
+   The rail is 22px wide and fixed, so the body gets that much right padding
+   to stay clear of it. */
+@media (min-width: 768px) {
+  html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  body {
+    padding-right: 22px;
+  }
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brass);

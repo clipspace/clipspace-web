@@ -575,7 +575,7 @@ export default function Home() {
         </div>
       </footer>
 
-      <ScrollPal stops={STOPS} idleLines={IDLE_LINES} />
+      <ScrollPal stops={STOPS} idleLines={IDLE_LINES} edge={30} />
     </main>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import ScrollReveal from "@/components/ScrollReveal";
+import ScrollBar from "@/components/ScrollBar";
 import "clip-pal/styles.css";
 import "./globals.css";
 
@@ -82,6 +83,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {children}
         <ScrollReveal />
+        <ScrollBar />
         <Analytics />
       </body>
     </html>
